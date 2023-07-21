@@ -1,29 +1,27 @@
 package com.indi.project.dto.user.req;
 
 import com.indi.project.entity.User;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserJoinReqDto {
+
+    @NotNull
     private String name;
+    @NotNull
     private String nickName;
+    @NotNull
     private String loginId;
+    @NotNull
     private String password;
 
-    @Builder
-    public UserJoinReqDto(String name, String nickName, String loginId, String password) {
-        this.name = name;
-        this.nickName = nickName;
-        this.loginId = loginId;
-        this.password = password;
-    }
+    public UserJoinReqDto(){}
 
     public User toEntity(String password){
         return User.builder()

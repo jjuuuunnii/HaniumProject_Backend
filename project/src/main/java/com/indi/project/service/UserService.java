@@ -6,35 +6,45 @@ import com.indi.project.dto.user.res.UserJoinResDto;
 import com.indi.project.entity.User;
 import com.indi.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
+import java.util.Optional;
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@ToString
 @Transactional(readOnly = true)
-public class UserService {
+public class UserService implements JoinResult{
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+
 
     @Transactional
     public UserJoinResDto joinUser(UserJoinReqDto userJoinReqDto) {
         validationDuplicationId(userJoinReqDto.getLoginId(), userJoinReqDto.getName());
-        User user = userJoinReqDto.toEntity(passwordEncoder.encode(userJoinReqDto.getPassword()));
+        User user = userJoinReqDto.toEntity(userJoinReqDto.getPassword());
         Long savedUserId = userRepository.save(user);
-        return new UserJoinResDto();
+        log.info("joinSuccess");
+        return new UserJoinResDto(JOIN_SUCCESS);
     }
 
     private void validationDuplicationId(String loginId, String nickName) {
-        List<User> byLoginIdUsers = userRepository.findByLoginId(loginId);
-        List<User> byNickNameUsers = userRepository.findByName(nickName);
-        if(!(byNickNameUsers.isEmpty()) || !(byLoginIdUsers.isEmpty()) ){
-            throw new IllegalStateException("이미 존재하는 회원입니다");
+        Optional<User> byLoginIdUser = userRepository.findByLoginId(loginId);
+        Optional<User> byNickNameUser = userRepository.findByName(nickName);
+
+        if(byLoginIdUser.isPresent() && byNickNameUser.isPresent()){
+            throw new IllegalArgumentException(DUPLICATION_ERROR_BOTH);
+        }
+        if(byNickNameUser.isPresent()){
+            throw new IllegalStateException(DUPLICATION_ERROR_NICKNAME);
+        }
+        if(byLoginIdUser.isPresent()){
+            throw new IllegalStateException(DUPLICATION_ERROR_ID);
         }
     }
-
-
 }
+

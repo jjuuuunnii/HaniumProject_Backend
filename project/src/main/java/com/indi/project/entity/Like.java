@@ -6,8 +6,9 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Setter
+@Table(name="likes",uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "video_id"}))
 @Getter
+@Setter
 public class Like {
 
     @Id
@@ -20,5 +21,8 @@ public class Like {
     @JoinColumn(name = "video_id")
     private Video video;
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
+
