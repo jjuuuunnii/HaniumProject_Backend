@@ -31,7 +31,6 @@ public class UserJoinReqDto {
                 .nickName(nickName)
                 .loginId(loginId)
                 .password(password)
-                .followerCnt(0)
                 .createAt(LocalDateTime.now())
                 .build();
     }

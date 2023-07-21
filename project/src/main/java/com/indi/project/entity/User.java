@@ -11,7 +11,9 @@ import java.util.List;
 @Entity
 @Setter
 @Getter
-@NoArgsConstructor
+@ToString
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -24,7 +26,6 @@ public class User {
     private String name;
     private String nickName;
     private String password;
-    private Integer followerCnt;
     private LocalDateTime createAt;
 
     @OneToMany(mappedBy = "followingUser", cascade = CascadeType.ALL)
@@ -36,17 +37,5 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Video> videos = new ArrayList<>();
 
-    @Builder
-    public User(Long id, String loginId, String name, String nickName, String password, Integer followerCnt, LocalDateTime createAt, List<Follow> followings, List<Follow> followers, List<Video> videos) {
-        this.id = id;
-        this.loginId = loginId;
-        this.name = name;
-        this.nickName = nickName;
-        this.password = password;
-        this.followerCnt = followerCnt;
-        this.createAt = createAt;
-        this.followings = followings;
-        this.followers = followers;
-        this.videos = videos;
-    }
+    public User(){}
 }

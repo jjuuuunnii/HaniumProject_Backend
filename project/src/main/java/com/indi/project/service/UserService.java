@@ -24,7 +24,7 @@ public class UserService {
     public UserJoinResDto joinUser(UserJoinReqDto userJoinReqDto) {
         validationDuplicationId(userJoinReqDto.getLoginId(), userJoinReqDto.getName());
         User user = userJoinReqDto.toEntity(passwordEncoder.encode(userJoinReqDto.getPassword()));
-        userRepository.save(user);
+        Long savedUserId = userRepository.save(user);
         return new UserJoinResDto();
     }
 

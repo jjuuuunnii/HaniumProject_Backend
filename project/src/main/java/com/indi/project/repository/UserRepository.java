@@ -2,6 +2,7 @@ package com.indi.project.repository;
 
 import com.indi.project.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Entity;
@@ -19,8 +20,9 @@ public class UserRepository {
     //findAll
     //deleteById
 
-    public void save(User user) {
+    public Long save(User user) {
         em.persist(user);
+        return user.getId();
     }
 
     public User findById(Long id) {
@@ -41,7 +43,6 @@ public class UserRepository {
                 .getResultList();
     }
 
-
     public List<User> findAll(){
         return em.createQuery("select u from User u", User.class)
                 .getResultList();
@@ -50,7 +51,7 @@ public class UserRepository {
     public void deleteById(Long id) {
         User user = em.find(User.class, id);
         if (user == null) {
-            throw new IllegalArgumentException("No user with id " + id);
+            throw new InvalidDataAccessApiUsageException("No user with id " + id);
         }
         em.remove(user);
     }
