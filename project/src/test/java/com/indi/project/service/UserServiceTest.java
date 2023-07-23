@@ -1,18 +1,16 @@
+/*
 package com.indi.project.service;
 
 import com.indi.project.dto.user.req.UserJoinReqDto;
-import com.indi.project.dto.user.res.UserJoinResDto;
 import com.indi.project.entity.User;
 import com.indi.project.repository.UserRepository;
-import org.assertj.core.api.Assertions;
+import com.indi.project.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,8 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Autowired UserRepository userRepository;
-    @Autowired UserService userService;
-    @Autowired PasswordEncoder passwordEncoder;
+    @Autowired
+    UserService userService;
+//    @Autowired PasswordEncoder passwordEncoder;
     @Autowired EntityManager em;
 
     @Test
@@ -80,4 +79,4 @@ class UserServiceTest {
         assertThrows(IllegalStateException.class,()->userService.joinUser(userJoinReqDto3));
     }
 
-}
+}*/

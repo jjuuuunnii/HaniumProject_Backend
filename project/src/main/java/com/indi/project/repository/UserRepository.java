@@ -38,6 +38,19 @@ public class UserRepository {
         return Optional.ofNullable(user);
     }
 
+    //이름은 중복 가능
+    public Optional<List> findByName(String name) {
+        try {
+            List<User> users = em.createQuery("select u from User u where u.name = :name", User.class)
+                    .setParameter("name", name)
+                    .getResultList();
+            return Optional.ofNullable(users);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
+    //로그인 아이디 중복 불가능
     public Optional<User> findByLoginId(String loginId) {
         try {
             User user = em.createQuery("select u from User u where u.loginId = :loginId", User.class)
@@ -49,10 +62,11 @@ public class UserRepository {
         }
     }
 
-    public Optional<User> findByName(String name) {
+    //닉네임 중복 불가능
+    public Optional<User> findByNickName(String nickName) {
         try {
-            User user = em.createQuery("select u from User u where u.name = :name", User.class)
-                    .setParameter("name", name)
+            User user = em.createQuery("select u from User u where u.nickName = :nickName", User.class)
+                    .setParameter("nickName", nickName)
                     .getSingleResult();
             return Optional.ofNullable(user);
         } catch (NoResultException e) {

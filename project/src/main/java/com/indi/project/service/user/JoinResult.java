@@ -1,4 +1,4 @@
-package com.indi.project.service;
+package com.indi.project.service.user;
 
 public interface JoinResult {
     public String JOIN_SUCCESS = "success";
