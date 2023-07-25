@@ -4,10 +4,13 @@ package com.indi.project.service.user;
 import com.indi.project.dto.user.req.UserJoinReqDto;
 import com.indi.project.dto.user.res.UserJoinResDto;
 import com.indi.project.entity.User;
+import com.indi.project.exception.CustomException;
+import com.indi.project.exception.ErrorCode;
 import com.indi.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -18,16 +21,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @ToString
-@Transactional(readOnly = true)
 public class UserService implements JoinResult {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
-    @Transactional
     public UserJoinResDto joinUser(UserJoinReqDto userJoinReqDto) {
         validationDuplicationId(userJoinReqDto.getLoginId(), userJoinReqDto.getNickName());
-        User user = userJoinReqDto.toEntity(userJoinReqDto.getPassword());
+        User user = userJoinReqDto.toEntity(passwordEncoder.encode(userJoinReqDto.getPassword()));
         userRepository.save(user);
         log.info("joinSuccess");
         return new UserJoinResDto(JOIN_SUCCESS);
@@ -38,13 +40,13 @@ public class UserService implements JoinResult {
         Optional<User> byNickNameUser = userRepository.findByNickName(nickName);
 
         if(byLoginIdUser.isPresent() && byNickNameUser.isPresent()){
-            throw new IllegalStateException(DUPLICATION_ERROR_BOTH);
+            throw new CustomException(ErrorCode.ID_AND_NICKNAME_DUPLICATION);
         }
         if(byNickNameUser.isPresent()){
-            throw new IllegalStateException(DUPLICATION_ERROR_NICKNAME);
+            throw new CustomException(ErrorCode.NICKNAME_DUPLICATION);
         }
         if(byLoginIdUser.isPresent()){
-            throw new IllegalStateException(DUPLICATION_ERROR_ID);
+            throw new CustomException(ErrorCode.ID_DUPLICATION);
         }
     }
 }

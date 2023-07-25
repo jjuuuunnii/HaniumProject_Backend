@@ -27,6 +27,7 @@ public class User {
     private String nickName;
     private String password;
     private LocalDateTime createAt;
+    private String refreshToken;
 
     @OneToMany(mappedBy = "followingUser", cascade = CascadeType.ALL)
     private List<Follow> followings = new ArrayList<>();

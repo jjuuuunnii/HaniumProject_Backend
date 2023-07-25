@@ -2,20 +2,33 @@ package com.indi.project.exception;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
-public enum  ErrorCode {
+public enum ErrorCode {
 
-    NOT_BLANK_NAME("ERROR_CODE_BLANK_NAME","이름이 누락되었습니다."),
-    NOT_BLANK_NICKNAME("ERROR_CODE_BLANK_NICKNAME","닉네임이 누락되었습니다."),
-    NOT_BLANK_LOGINID("ERROR_CODE_BLANK_NAME","ID가 누락되었습니다."),
-    NOT_BLANK_PASSWORD("ERROR_CODE_BLANK_NAME","비밀번호가 누락되었습니다."),
-    PATTERN("ERROR_CODE_PATTERN", "값 형식이 다릅니다.");
+    USER_NOT_FOUND(404,"USER NOT FOUND", "User Not Found"),
+    ID_DUPLICATION(400, "ID DUPLICATION", "Duplicated Id"),
+    NICKNAME_DUPLICATION(400, "NICKNAME DUPLICATION", "Duplicated NickName"),
+    ID_AND_NICKNAME_DUPLICATION(400, "ID AND NICKNAME DUPLICATION", "Duplicated Id Both NickName"),
+    AUTHENTICATION_ERROR_NO_USER(500,"AUTHENTICATION ERROR NO USER", "LoadUserByUsername Error"),
+    /**
+     * TODO
+     *
+     * 토큰 재발급하기
+     * 구현해야함
+     */
+    //내부에서 알아서 처리함
+    ILLEGAL_REFRESH_TOKEN(401, "ILLEGAL_REFRESH_TOKEN", "Illegal Refresh Token"),
+    //ACCESSTOKEN 컨트롤러 따로 만듦
+    ILLEGAL_ACCESS_TOKEN(401, "ILLEGAL_REFRESH_TOKEN", "Illegal Refresh Token");
 
+    private final int status;
+    private final String code;
+    private final String description;
 
-    private String code;
-    private String description;
-
-    ErrorCode(String code, String description) {
+    ErrorCode(int status, String code,String description) {
+        this.status = status;
         this.code = code;
         this.description = description;
     }
