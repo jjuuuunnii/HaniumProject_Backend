@@ -88,5 +88,13 @@ public class UserRepository {
                 });
     }
 
+    public Optional<User> findByRefreshToken(String refreshToken) {
+        List<User> user = em.createQuery("select u from User u where u.refreshToken = :refreshToken", User.class)
+                .setParameter("refreshToken", refreshToken)
+                .getResultList();
+
+        return user.stream().findAny();
+    }
+
 
 }

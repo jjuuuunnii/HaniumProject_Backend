@@ -1,4 +1,4 @@
-package com.indi.project.controller;
+package com.indi.project.controller.user;
 
 import com.indi.project.dto.user.req.UserJoinReqDto;
 import com.indi.project.dto.user.res.UserJoinResDto;
