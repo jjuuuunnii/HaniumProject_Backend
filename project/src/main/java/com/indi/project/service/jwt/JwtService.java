@@ -90,7 +90,7 @@ public class JwtService implements JwtProperties{
             updateRefreshToken(refreshToken, response);
         }
     }
-    @Transactional
+
     private void updateRefreshToken(String refreshToken, HttpServletResponse response) {
         User userByRefreshToken = getUserByRefreshToken(refreshToken);
         String newRefreshToken = createRefreshToken();
