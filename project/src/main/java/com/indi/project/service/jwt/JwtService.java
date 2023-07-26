@@ -3,7 +3,9 @@ package com.indi.project.service.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.indi.project.dto.Token.TokenDto;
 import com.indi.project.entity.User;
 import com.indi.project.exception.CustomException;
@@ -98,9 +100,14 @@ public class JwtService implements JwtProperties{
 
     @Transactional
     public void checkAccessTokenValid(String token) {
-        JWT.require(Algorithm.HMAC512(JwtProperties.SECRET_KEY))
-                .build()
-                .verify(token);
+        try{
+            JWT.require(Algorithm.HMAC512(JwtProperties.SECRET_KEY))
+                    .build()
+                    .verify(token);
+        }catch (JWTVerificationException e){
+            throw new CustomException(Err)
+        }
+
     }
 
 
@@ -138,7 +145,7 @@ public class JwtService implements JwtProperties{
     }
 
     @Transactional
-    public void setAccessToken(TokenDto tokenDto, HttpServletResponse response) {
+    public void setNewAccessToken(TokenDto tokenDto, HttpServletResponse response) {
         String accessToken = createAccessToken(tokenDto.getLoginId(), tokenDto.getUserName());
         response.setHeader(JwtProperties.ACCESS_HEADER_PREFIX, JwtProperties.TOKEN_PREFIX
                 + accessToken);
@@ -151,6 +158,22 @@ public class JwtService implements JwtProperties{
             return Optional.of(token);
         } else {
             return Optional.empty();
+        }
+    }
+
+    public User getUserByAccessToken(String token) {
+        // Decode token and extract user id
+        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET_KEY))
+                .build()
+                .verify(token);
+        String loginId = decodedJWT.getClaim("loginId").asString();
+
+        // Get user from database
+        Optional<User> optionalUser = userRepository.findByLoginId(loginId);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new UsernameNotFoundException("User not found with id : " + loginId);
         }
     }
 
