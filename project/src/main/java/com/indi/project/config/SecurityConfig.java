@@ -1,15 +1,15 @@
 package com.indi.project.config;
 
-import com.indi.project.entity.User;
+import com.indi.project.repository.UserRepository;
 import com.indi.project.security.CustomAccessDeniedHandler;
 import com.indi.project.security.CustomAuthenticationEntryPoint;
-import com.indi.project.service.filter.JWTAuthenticationFilter;
-import com.indi.project.service.filter.JWtAuthorizationFilter;
+import com.indi.project.service.filter.JwtAuthenticationFilter;
+import com.indi.project.service.filter.JwtAuthorizationFilter;
 import com.indi.project.service.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -24,36 +24,39 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CorsFilter corsFilter;
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtService jwtService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(), jwtService);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager(), jwtService);
 
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        http
+                .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .addFilter(corsFilter)
                 .formLogin().disable()
                 .httpBasic().disable()
-                .addFilter(corsFilter)
-                .addFilter(new JWTAuthenticationFilter(authenticationManager, jwtService))
-                .addFilter(new JWtAuthorizationFilter(authenticationManager, jwtService))
                 .authorizeRequests()
-                .antMatchers("/login/**").permitAll() // 로그인 경로는 누구나 접근 가능
-                .antMatchers("/signup/**").permitAll()
-                .antMatchers("/").permitAll()
-                .anyRequest().authenticated()// 나머지 요청은 모두 인증된 사용자만 접근 가능
+                .antMatchers("/signup/**", "/login/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(customAuthenticationEntryPoint); // 인증 실패 시 401 Unauthorized 반환
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler)
+                .and()
+                .addFilter(jwtAuthenticationFilter)
+                .addFilter(jwtAuthorizationFilter);
 
         return http.build();
     }
-
 }
+
 
 
 

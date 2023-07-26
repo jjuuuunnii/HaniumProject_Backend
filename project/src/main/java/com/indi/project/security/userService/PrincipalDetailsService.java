@@ -1,6 +1,7 @@
 package com.indi.project.security.userService;
 
 
+import com.indi.project.dto.user.UserJwtDto;
 import com.indi.project.entity.User;
 import com.indi.project.exception.CustomException;
 import com.indi.project.exception.ErrorCode;
@@ -26,14 +27,10 @@ public class PrincipalDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByLoginId(username)
-                // ErrorCode.USER_NOT_FOUND
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-/*        User user = userRepository.findByLoginId(username)
-                // ErrorCode.USER_NOT_FOUND
-                .orElseThrow(() -> new UsernameNotFoundException("USER NOT FOUND"));*/
+    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
+
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new UsernameNotFoundException(ErrorCode.USER_NOT_FOUND.getDescription()));
 
         return new PrincipalDetails(user);
     }

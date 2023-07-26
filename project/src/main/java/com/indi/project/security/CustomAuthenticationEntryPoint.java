@@ -1,6 +1,8 @@
 package com.indi.project.security;
 
+import com.indi.project.service.jwt.JwtProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -17,15 +19,23 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
+        String exceptionMessage = (String) request.getAttribute(JwtProperties.EXCEPTION);
 
-        log.info("commence check");
-        if (authException instanceof InternalAuthenticationServiceException) {
-            log.error("kkaksdkf");
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
-        } else {
-            log.error("adsfadsfasdfadfs");
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-        }
+        log.error("Exception : " + exceptionMessage);
+
+        setReponse(response, exceptionMessage);
+    }
+    private void setReponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+
+        log.info("entryPoint");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("success", false);
+        jsonObject.put("code", -1);
+        jsonObject.put("message", message);
+
+        response.getWriter().print(jsonObject);
     }
 
 

@@ -21,12 +21,14 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @ToString
+@Transactional(readOnly = true)
 public class UserService implements JoinResult {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
 
+    @Transactional
     public UserJoinResDto joinUser(UserJoinReqDto userJoinReqDto) {
         validationDuplicationId(userJoinReqDto.getLoginId(), userJoinReqDto.getNickName());
         User user = userJoinReqDto.toEntity(passwordEncoder.encode(userJoinReqDto.getPassword()));

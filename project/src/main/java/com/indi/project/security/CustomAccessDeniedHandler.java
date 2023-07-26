@@ -1,6 +1,8 @@
 package com.indi.project.security;
 
+import com.indi.project.exception.ErrorCode;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -13,17 +15,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-@Log4j2
+@Slf4j
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
-    public void handle(HttpServletRequest req, HttpServletResponse res, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        log.info("AccessDenied");
+        response.sendRedirect("/exception/accessDenied");
 
-        log.error("Access Denied Handler");
-        log.error("Redirect....");
-
-        //response.sendRedirect("/accessError");
-        setResponse(res, accessDeniedException.getMessage());
+    }
+    @GetMapping(value = "/accessDenied")
+    public void accessDenied(HttpServletResponse response) {
+        throw new AccessDeniedException("accessDenied");
     }
 
     private void setResponse(HttpServletResponse res, String message) throws IOException {
@@ -38,11 +41,5 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         res.getWriter().write(jObj.toString());
     }
 
-    @GetMapping(value = "accessDenied")
-    public void accessDenied() {
-        log.error("Access Denied Handler");
-        log.error("Redirect....");
 
-        throw new AccessDeniedException("Access Denied");
-    }
 }

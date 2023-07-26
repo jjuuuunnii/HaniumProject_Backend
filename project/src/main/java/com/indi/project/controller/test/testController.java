@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
+@RequestMapping("/test")
 public class testController {
 
     @RequestMapping("/test")
     public String test(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        principalDetails.getUser().getName();
-        log.info("testController");
+        String name = principalDetails.getUser().getName();
+        log.info("testController={}",name);
         return "test";
     }
 }

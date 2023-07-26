@@ -6,6 +6,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.indi.project.dto.Token.TokenDto;
 import com.indi.project.entity.User;
+import com.indi.project.exception.CustomException;
+import com.indi.project.exception.ErrorCode;
 import com.indi.project.repository.UserRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,42 @@ public class JwtService implements JwtProperties{
 
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
+    public User getUserByRefreshToken(String refreshToken) {
+
+        Optional<User> byRefreshToken = userRepository.findByRefreshToken(refreshToken);
+        if(byRefreshToken.isEmpty()){
+            throw new UsernameNotFoundException("User not found with refreshToken: " + refreshToken);
+        }
+        log.info("loginId={}", byRefreshToken.get().getLoginId());
+        log.info("password={}", byRefreshToken.get().getPassword());
+        return byRefreshToken.get();
+    }
+
+    @Transactional
+    public void setRefreshToken(String loginId, String refreshJwt) {
+        userRepository.findByLoginId(loginId)
+                .ifPresent(user -> user.setRefreshToken(refreshJwt));
+    }
+
+    @Transactional
+    public void removeRefreshToken(String token) {
+        userRepository.findByRefreshToken(token)
+                .ifPresent(u->u.setRefreshToken(null));
+    }
+
+    public void logout(HttpServletRequest request) {
+        try {
+            checkHeaderValid(request);
+            String refreshJwtToken = request
+                    .getHeader(JwtProperties.REFRESH_HEADER_PREFIX)
+                    .replace(JwtProperties.TOKEN_PREFIX, "");
+            removeRefreshToken(refreshJwtToken);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+    }
+
     public String createAccessToken(String loginId, String userName){
         return JWT.create()
                 .withSubject(JwtProperties.ACCESS_TOKEN)
@@ -46,14 +84,16 @@ public class JwtService implements JwtProperties{
                 .withExpiresAt(new Date(System.currentTimeMillis() + (JwtProperties.REFRESH_EXPIRATION_TIME)))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET_KEY));
     }
-    @Transactional
-    public void setRefreshToken(String loginId, String refreshJwt) {
-        Optional<User> byLoginId = userRepository.findByLoginId(loginId);
-        if(byLoginId.isPresent()){
-            byLoginId.get().setRefreshToken(refreshJwt);
-            log.info("RefreshToken set");
+
+    public void checkHeaderValid(HttpServletRequest request) {
+        String accessJwt = request.getHeader(JwtProperties.ACCESS_HEADER_PREFIX);
+        String refreshJwt = request.getHeader(JwtProperties.REFRESH_HEADER_PREFIX);
+
+        if (accessJwt == null && refreshJwt == null) {
+
+        } else{
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-//        userRepository.findByLoginId(loginId).ifPresent(user -> user.setRefreshToken(refreshJwt));
     }
 
     @Transactional
@@ -62,11 +102,7 @@ public class JwtService implements JwtProperties{
                 .build()
                 .verify(token);
     }
-    @Transactional
-    public User getUserByRefreshToken(String refreshToken) {
-        return userRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with refreshToken: " + refreshToken));
-    }
+
 
     @Transactional
     public void checkRefreshTokenValid(String refreshToken, HttpServletResponse response) {
@@ -91,7 +127,8 @@ public class JwtService implements JwtProperties{
         }
     }
 
-    private void updateRefreshToken(String refreshToken, HttpServletResponse response) {
+    @Transactional
+    void updateRefreshToken(String refreshToken, HttpServletResponse response) {
         User userByRefreshToken = getUserByRefreshToken(refreshToken);
         String newRefreshToken = createRefreshToken();
 
@@ -99,6 +136,7 @@ public class JwtService implements JwtProperties{
                 + newRefreshToken);
         setRefreshToken(userByRefreshToken.getLoginId(),newRefreshToken);
     }
+
     @Transactional
     public void setAccessToken(TokenDto tokenDto, HttpServletResponse response) {
         String accessToken = createAccessToken(tokenDto.getLoginId(), tokenDto.getUserName());

@@ -19,7 +19,6 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 @ToString
-@Transactional(readOnly = true)
 public class UserRepository {
 
     private final EntityManager em;
@@ -28,18 +27,18 @@ public class UserRepository {
     //findById
     //findAll
     //deleteById
-    @Transactional
+
     public Long save(User user) {
         log.info("save user = {}", user);
         em.persist(user);
         return user.getId();
     }
-    @Transactional(readOnly = true)
+
     public Optional<User> findById(Long id) {
         User user = em.find(User.class, id);
         return Optional.ofNullable(user);
     }
-    @Transactional(readOnly = true)
+
     //이름은 중복 가능
     public Optional<List> findByName(String name) {
         try {
@@ -51,7 +50,7 @@ public class UserRepository {
             return Optional.empty();
         }
     }
-    @Transactional(readOnly = true)
+
     //로그인 아이디 중복 불가능
     public Optional<User> findByLoginId(String loginId) {
         try {
@@ -63,7 +62,7 @@ public class UserRepository {
             return Optional.empty();
         }
     }
-    @Transactional(readOnly = true)
+
     //닉네임 중복 불가능
     public Optional<User> findByNickName(String nickName) {
         try {
@@ -75,12 +74,12 @@ public class UserRepository {
             return Optional.empty();
         }
     }
-    @Transactional(readOnly = true)
+
     public List<User> findAll(){
         return em.createQuery("select u from User u", User.class)
                 .getResultList();
     }
-    @Transactional
+
     public void deleteById(Long id) {
         Optional<User> user = findById(id);
         user.ifPresentOrElse(
@@ -89,7 +88,7 @@ public class UserRepository {
                     throw new InvalidDataAccessApiUsageException("No user with id " + id);
                 });
     }
-    @Transactional(readOnly = true)
+
     public Optional<User> findByRefreshToken(String refreshToken) {
         List<User> user = em.createQuery("select u from User u where u.refreshToken = :refreshToken", User.class)
                 .setParameter("refreshToken", refreshToken)
@@ -97,4 +96,17 @@ public class UserRepository {
 
         return user.stream().findAny();
     }
+
+    public Optional<User> findByLoginIdAndPassword(String loginId, String password) {
+        List<User> resultList = em.createQuery("select u from User u where u.loginId = :loginId and u.password = :password", User.class)
+                .setParameter("loginId", loginId)
+                .setParameter("password", password)
+                .getResultList();
+        if(resultList.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(resultList.get(0));
+        }
+    }
+
 }

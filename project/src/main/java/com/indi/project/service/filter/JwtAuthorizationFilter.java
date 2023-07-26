@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,58 +22,59 @@ import java.util.Optional;
 
 /**
  * TODO
- *
+ * <p>
  * 일단 여기서  Transaction구현 해야할듯하고 Refresh Token도 어떻게 해결해야함
  * 그리고  SecurityConfig에 추가해야돼
  */
 
 
 @Slf4j
-public class JWtAuthorizationFilter extends BasicAuthenticationFilter {
+public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 
     private final JwtService jwtService;
 
-    public JWtAuthorizationFilter(AuthenticationManager authenticationManager,JwtService jwtService) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
         super(authenticationManager);
         this.jwtService = jwtService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException, RuntimeException {
-        //만약 헤더에 둘다 없으면 바로 리턴 때리기
-        if (request.getHeader("Authorization") == null && request.getHeader("RefreshAuthorization") == null) {
-            SecurityContextHolder.getContext().setAuthentication(null);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
+        if (request.getHeader("Authorization") == null && request.getHeader("ReAuthorization") == null) {
+            SecurityContextHolder.getContext().setAuthentication(null);
             chain.doFilter(request, response);
             return;
         }
 
-        Optional<String> accessToken = jwtService.getToken(request,JwtProperties.ACCESS_HEADER_PREFIX);
-        Optional<String> refreshToken = jwtService.getToken(request,JwtProperties.REFRESH_HEADER_PREFIX);
+        //만약 헤더에 둘다 없으면 바로 리턴 때리기
 
-        if(refreshToken.isPresent()){
-            jwtService.checkRefreshTokenValid(refreshToken.get(),response);
-        }else{
+        Optional<String> accessToken = jwtService.getToken(request, JwtProperties.ACCESS_HEADER_PREFIX);
+        Optional<String> refreshToken = jwtService.getToken(request, JwtProperties.REFRESH_HEADER_PREFIX);
+
+        if (refreshToken.isPresent()) {
+            jwtService.checkRefreshTokenValid(refreshToken.get(), response);
+        } else {
             throw new CustomException(ErrorCode.ILLEGAL_REFRESH_TOKEN);
         }
 
-        if(accessToken.isPresent()){
+        if (accessToken.isPresent()) {
             jwtService.checkAccessTokenValid(accessToken.get());
-        }else{
+        } else {
             throw new CustomException(ErrorCode.ILLEGAL_ACCESS_TOKEN);
         }
 
         User userByRefreshToken = jwtService.getUserByRefreshToken(refreshToken.get());
+
         PrincipalDetails principalDetails = new PrincipalDetails(userByRefreshToken);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                principalDetails, null);
+                principalDetails,null,null);
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        chain.doFilter(request,response);
-        return;
+        chain.doFilter(request, response);
     }
 
 }
