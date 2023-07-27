@@ -6,20 +6,27 @@ import java.time.LocalDateTime;
 
 @Getter
 public enum ErrorCode {
+    //400
+    NULL_POINT_EXCEPTION(false, "NULL POINT EXCEPTION"),
+    ID_DUPLICATION(false, "ID DUPLICATION"),
+    NICKNAME_DUPLICATION(false, "NICKNAME DUPLICATION"),
+    ID_AND_NICKNAME_DUPLICATION(false, "ID AND NICKNAME DUPLICATION"),
 
-    USER_NOT_FOUND(404,"USER NOT FOUND", "User Not Found"),
-    ID_DUPLICATION(400, "ID DUPLICATION", "Duplicated Id"),
-    NICKNAME_DUPLICATION(400, "NICKNAME DUPLICATION", "Duplicated NickName"),
-    ID_AND_NICKNAME_DUPLICATION(400, "ID AND NICKNAME DUPLICATION", "Duplicated Id Both NickName"),
-    AUTHENTICATION_ERROR_NO_USER(500,"AUTHENTICATION ERROR NO USER", "LoadUserByUsername Error");
+    //401
+    ACCESS_TOKEN_EXPIRED(false,"TOKEN EXPIRED"),
+    ILLEGAL_REFRESH_TOKEN(false, "ILLEGAL_REFRESH_TOKEN"),
+    ILLEGAL_ACCESS_TOKEN(false, "ILLEGAL_REFRESH_TOKEN"),
+    //404
+    USER_NOT_FOUND(false,"USER NOT FOUND"),
 
-    private final int status;
+    //500
+    AUTHENTICATION_ERROR_NO_USER(false,"AUTHENTICATION ERROR NO USER"),
+    LOGOUT_FAILED(false, "LOGIN FAILED");
+
+    private final boolean success;
     private final String code;
-    private final String description;
-
-    ErrorCode(int status, String code,String description) {
-        this.status = status;
+    ErrorCode(boolean success, String code) {
+        this.success = success;
         this.code = code;
-        this.description = description;
     }
 }

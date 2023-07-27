@@ -1,6 +1,4 @@
 package com.indi.project.service.user;
-
-
 import com.indi.project.dto.user.req.UserJoinReqDto;
 import com.indi.project.dto.user.res.UserJoinResDto;
 import com.indi.project.entity.User;
@@ -13,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.Optional;
 @Slf4j
@@ -22,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @ToString
 @Transactional(readOnly = true)
-public class UserService implements JoinResult {
+public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,8 +29,8 @@ public class UserService implements JoinResult {
         validationDuplicationId(userJoinReqDto.getLoginId(), userJoinReqDto.getNickName());
         User user = userJoinReqDto.toEntity(passwordEncoder.encode(userJoinReqDto.getPassword()));
         userRepository.save(user);
-        log.info("joinSuccess");
-        return new UserJoinResDto(JOIN_SUCCESS);
+        log.info("{} join success", user.getName());
+        return new UserJoinResDto(true, "SIGNUP SUCCESS");
     }
 
     private void validationDuplicationId(String loginId, String nickName) {

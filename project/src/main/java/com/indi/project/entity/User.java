@@ -37,7 +37,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "followingUser", cascade = CascadeType.ALL)
     private List<Follow> followings = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "followedUser", cascade = CascadeType.ALL)
     private List<Follow> followers = new ArrayList<>();
 

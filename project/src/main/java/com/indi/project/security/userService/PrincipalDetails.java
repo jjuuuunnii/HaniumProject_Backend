@@ -1,6 +1,5 @@
 package com.indi.project.security.userService;
 
-import com.indi.project.dto.user.UserJwtDto;
 import com.indi.project.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

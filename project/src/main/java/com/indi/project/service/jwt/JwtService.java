@@ -13,10 +13,7 @@ import com.indi.project.exception.ErrorCode;
 import com.indi.project.repository.UserRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,21 +28,18 @@ import java.util.Optional;
 @Getter
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class JwtService implements JwtProperties{
+public class JwtService implements JwtProperties {
 
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public User getUserByRefreshToken(String refreshToken) {
-
-        Optional<User> byRefreshToken = userRepository.findByRefreshToken(refreshToken);
-        if(byRefreshToken.isEmpty()){
-            throw new UsernameNotFoundException("User not found with refreshToken: " + refreshToken);
-        }
-        log.info("loginId={}", byRefreshToken.get().getLoginId());
-        log.info("password={}", byRefreshToken.get().getPassword());
-        return byRefreshToken.get();
+        User user = userRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user;
     }
+
+
 
     @Transactional
     public void setRefreshToken(String loginId, String refreshJwt) {
@@ -92,8 +86,6 @@ public class JwtService implements JwtProperties{
         String refreshJwt = request.getHeader(JwtProperties.REFRESH_HEADER_PREFIX);
 
         if (accessJwt == null && refreshJwt == null) {
-
-        } else{
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     }
@@ -105,9 +97,8 @@ public class JwtService implements JwtProperties{
                     .build()
                     .verify(token);
         }catch (JWTVerificationException e){
-            throw new CustomException(Err)
+            throw new CustomException(ErrorCode.ILLEGAL_ACCESS_TOKEN);
         }
-
     }
 
 
@@ -166,14 +157,15 @@ public class JwtService implements JwtProperties{
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET_KEY))
                 .build()
                 .verify(token);
-        String loginId = decodedJWT.getClaim("loginId").asString();
+        String loginId = decodedJWT.getClaim(JwtProperties.LOGIN_ID).asString();
+        log.info("loginID = {}", loginId);
 
         // Get user from database
         Optional<User> optionalUser = userRepository.findByLoginId(loginId);
         if (optionalUser.isPresent()) {
             return optionalUser.get();
         } else {
-            throw new UsernameNotFoundException("User not found with id : " + loginId);
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     }
 

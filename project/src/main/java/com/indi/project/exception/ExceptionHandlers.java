@@ -1,16 +1,24 @@
 package com.indi.project.exception;
 
+import com.indi.project.Result;
 import com.indi.project.dto.exception.ErrorDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.validation.ObjectError;
 
+
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,29 +58,35 @@ public class ExceptionHandlers {
     }*/
 
 
-    @ExceptionHandler({InternalAuthenticationServiceException.class})
+/*    @ExceptionHandler({InternalAuthenticationServiceException.class})
     public ResponseEntity<ErrorDto> handleInternalAuthenticationServiceException(
             InternalAuthenticationServiceException e){
         ErrorCode ex = ErrorCode.AUTHENTICATION_ERROR_NO_USER;
         log.error("error={}", e.getMessage());
         return new ResponseEntity<>(new ErrorDto(ex.getStatus(), ex.getCode(),
                 ex.getDescription()), HttpStatus.valueOf(ex.getStatus()));
-    }
+    }*/
 
-    @ExceptionHandler({UsernameNotFoundException.class})
+/*    @ExceptionHandler({UsernameNotFoundException.class})
     public ResponseEntity<ErrorDto> handleInternalAuthenticationServiceException(
             UsernameNotFoundException e){
         ErrorCode ex = ErrorCode.AUTHENTICATION_ERROR_NO_USER;
         log.error("error={}", e.getMessage());
         return new ResponseEntity<>(new ErrorDto(ex.getStatus(), ex.getCode(),
                 ex.getDescription()), HttpStatus.valueOf(ex.getStatus()));
-    }
+    }*/
 
     @ExceptionHandler({CustomException.class})
-    public ResponseEntity<ErrorDto> handleCustomException(CustomException e) {
-        log.info("error={}",e.getErrorCode().getCode());
-        return new ResponseEntity<>(new ErrorDto(e.getErrorCode().getStatus(), e.getErrorCode().getCode(),
-                e.getErrorCode().getDescription()), HttpStatus.valueOf(e.getErrorCode().getStatus()));
+    public Result<ErrorDto> handleCustomException(CustomException e) {
+        log.info("error = {}",e.getErrorCode().getCode());
+        return new Result<>(new ErrorDto(e.getErrorCode().isSuccess(), e.getErrorCode().getCode()));
+    }
+
+    //UserJoinDto에서 null값이 들어왔을때의 오류
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    public Result<ErrorDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        return new Result<>(new ErrorDto(false,"NULL POINT EXCEPTION"));
     }
 
 }

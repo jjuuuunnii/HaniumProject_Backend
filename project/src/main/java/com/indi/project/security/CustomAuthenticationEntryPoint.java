@@ -19,24 +19,17 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        String exceptionMessage = (String) request.getAttribute(JwtProperties.EXCEPTION);
-
-        log.error("Exception : " + exceptionMessage);
-
-        setReponse(response, exceptionMessage);
+        log.error("비로그인 사용자 요청");
+        setResponse(response);
     }
-    private void setReponse(HttpServletResponse response, String message) throws IOException {
+    private void setResponse(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-
-        log.info("entryPoint");
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("success", false);
-        jsonObject.put("code", -1);
-        jsonObject.put("message", message);
-
-        response.getWriter().print(jsonObject);
+        JSONObject result = new JSONObject();
+        jsonObject.put("success", "false");
+        jsonObject.put("code", "LOGIN FAILED");
+        result.put("data", jsonObject);
+        response.getWriter().write(result.toString());
     }
-
-
 }
