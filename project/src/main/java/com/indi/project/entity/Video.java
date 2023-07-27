@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +33,9 @@ public class Video {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "thumbnail_id")
     private Thumbnail thumbnail;
+
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 
     /*@ManyToOne
     @JoinColumn(name = "graphic_id")

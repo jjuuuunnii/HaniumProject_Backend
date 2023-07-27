@@ -43,6 +43,13 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Video> videos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
+    public void deleteRefreshToken(){
+        this.refreshToken = null;
+    }
+
     public User(){}
 
     @Override

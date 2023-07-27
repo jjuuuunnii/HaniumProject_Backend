@@ -50,9 +50,10 @@ public class JwtService implements JwtProperties {
     @Transactional
     public void removeRefreshToken(String token) {
         userRepository.findByRefreshToken(token)
-                .ifPresent(u->u.setRefreshToken(null));
+                .ifPresent(u->u.deleteRefreshToken());
     }
 
+    @Transactional
     public void logout(HttpServletRequest request) {
         try {
             checkHeaderValid(request);
@@ -168,7 +169,4 @@ public class JwtService implements JwtProperties {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     }
-
-
-
 }
