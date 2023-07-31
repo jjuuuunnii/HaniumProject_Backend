@@ -1,8 +1,7 @@
 package com.indi.project.exception;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+
 
 @Getter
 public enum ErrorCode {
@@ -18,9 +17,15 @@ public enum ErrorCode {
     ILLEGAL_ACCESS_TOKEN(false, "ILLEGAL_REFRESH_TOKEN"),
     //404
     USER_NOT_FOUND(false,"USER NOT FOUND"),
+    GET_VIDEOS_INFO_FAIL(false, "GET VIDEOS INFO FAIL"),
+    GET_VIDEO_INFO_FAIL(false, "GET VIDEO INFO FAIL"),
+    VIDEO_NOT_FOUND(false, "VIDEO NOT FOUND"),
+
+
 
     //500
     AUTHENTICATION_ERROR_NO_USER(false,"AUTHENTICATION ERROR NO USER"),
+    STORE_FILES_FAILS(false,"STORE FILES_FAILS"),
     LOGOUT_FAILED(false, "LOGIN FAILED");
 
     private final boolean success;

@@ -1,15 +1,17 @@
 package com.indi.project.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import com.indi.project.dto.commet.req.CommentReqDto;
+import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
+@ToString
 public class Comment {
 
     @Id
@@ -27,4 +29,8 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "video_id")
     private Video video;
+
+    private LocalDateTime createAt;
+    public Comment(){}
+
 }

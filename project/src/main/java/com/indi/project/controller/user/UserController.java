@@ -20,24 +20,24 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Slf4j
 @ToString
-@RequestMapping("/auth")
 public class UserController {
 
     private final UserService userService;
     private final JwtService jwtService;
     private final JsonService jsonService;
 
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     public Result<UserJoinResDto> joinUser(@Validated @RequestBody UserJoinReqDto userJoinReqDto) {
         log.info("userJoinReqDto={}", userJoinReqDto.toString());
 
         return new Result<>(userService.joinUser(userJoinReqDto));
     }
-
-    @PutMapping("/logout")
+    @PutMapping("/auth/logout")
     public void logoutUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         jwtService.logout(request);
         jsonService.responseToJson(response, HttpServletResponse.SC_OK,true,"LOGOUT SUCCESS");
     }
+
+
 
 }

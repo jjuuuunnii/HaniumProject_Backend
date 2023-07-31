@@ -17,3 +17,13 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
 #  org.hibernate.type: trace
+
+file:
+  dir:
+    video: C:/Users/jake9/indi/videoFile
+    thumbnail: C:/Users/jake9/indi/thumbNailFile
+    profile: C:/Users/jake9/indi/profile
+
+
+
+#  file.dir=C:/Users/jake9/Spring/Spring MVC_2/file/

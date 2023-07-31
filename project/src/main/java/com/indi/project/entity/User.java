@@ -32,6 +32,7 @@ public class User implements UserDetails {
     private String password;
     private LocalDateTime createAt;
     private String refreshToken;
+    private String profileImageUrl;
 
 
     @OneToMany(mappedBy = "followingUser", cascade = CascadeType.ALL)
@@ -45,6 +46,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Like> likes = new ArrayList<>();
 
     public void deleteRefreshToken(){
         this.refreshToken = null;

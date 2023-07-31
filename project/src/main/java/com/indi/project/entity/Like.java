@@ -1,5 +1,7 @@
 package com.indi.project.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +11,8 @@ import javax.persistence.*;
 @Table(name="likes",uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "video_id"}))
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class Like {
 
     @Id
@@ -24,5 +28,9 @@ public class Like {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    private boolean likeStatus;
+
+    public Like(){}
 }
 

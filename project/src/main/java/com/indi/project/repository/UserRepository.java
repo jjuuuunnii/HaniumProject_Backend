@@ -1,6 +1,7 @@
 package com.indi.project.repository;
 
 import com.indi.project.entity.User;
+import com.indi.project.entity.Video;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,6 +109,10 @@ public class UserRepository {
         } else {
             return Optional.ofNullable(resultList.get(0));
         }
+    }
+
+    public Optional<List> findVideosByUserLoginId(String loginId) {
+        return Optional.ofNullable(findByLoginId(loginId).get().getVideos());
     }
 
 }

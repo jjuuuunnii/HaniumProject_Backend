@@ -1,6 +1,8 @@
 package com.indi.project.entity;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +14,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class Video {
 
     @Id
@@ -24,31 +28,33 @@ public class Video {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Lob
-    private byte[] videoFile;
-
     @Enumerated(EnumType.STRING)
     private Genre genre;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "thumbnail_id")
-    private Thumbnail thumbnail;
 
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
-    /*@ManyToOne
-    @JoinColumn(name = "graphic_id")
-    private Graphic graphic;
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
+    private List<Like> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "video")
-    private List<VideosGraphics> videosGraphics;
-*/
-    private int likeCnt;
+    private String videoPath;
+    private String thumbNailPath;
     private String title;
-    private int viewCnt;
-    private int viewsByTime;
+    private int views;
     private LocalDateTime createdAt;
+
+    //private int viewsByTime;
+
+    public Video(){}
+    public int totalLikesCnt(){
+        return likes.size();
+    }
+
+    public void increaseViewCnt(){
+        int result = getViews();
+        setViews(result);
+    }
+
 
 
 }

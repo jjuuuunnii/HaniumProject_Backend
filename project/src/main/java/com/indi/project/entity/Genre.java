@@ -9,15 +9,14 @@ public enum Genre {
      * 발라드
      * 랩/힙합
      */
+    INDIMUSIC("IndiMusic"),
+    ROCKMETAL("RockMetal"),
+    RNBSOUL("RnBSoul"),
+    POP("Pop"),
+    BALLAD("Ballad"),
+    RAPHIPHOP("RapHiphop");
 
-    INDI("인디"),
-    ROCK_AND_METAL("락메탈"),
-    RNB_SOUL("알앤비"),
-    POP("팝"),
-    BALLAD("발라드"),
-    RAP_HIPHOP("랩힙합");
-
-    private String genre;
+    private final String genre;
 
     Genre(String genre) {
         this.genre = genre;
