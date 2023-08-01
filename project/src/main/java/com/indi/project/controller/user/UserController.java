@@ -1,5 +1,7 @@
 package com.indi.project.controller.user;
 
+import com.indi.project.dto.mypage.GetMyPageDto;
+import com.indi.project.service.video.VideoService;
 import com.indi.project.success.Result;
 import com.indi.project.dto.user.req.UserJoinReqDto;
 import com.indi.project.dto.user.res.UserJoinResDto;
@@ -24,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final JwtService jwtService;
     private final JsonService jsonService;
+    private final VideoService videoService;
 
     @PostMapping("/auth/signup")
     public Result<UserJoinResDto> joinUser(@Validated @RequestBody UserJoinReqDto userJoinReqDto) {
@@ -38,5 +41,9 @@ public class UserController {
     }
 
 
+    @GetMapping("/mypage/{loginId}")
+    public Result<GetMyPageDto> getMypageInfo(@PathVariable String loginId){
+        return new Result<>(userService.getMyPageInfo(loginId));
+    }
 
 }

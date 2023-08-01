@@ -29,10 +29,6 @@ import java.util.List;
 @RequestMapping(value = "/videos", produces = "application/json")
 public class VideoController {
 
-    /**
-     * TODO
-     * 엔드포인트 바꾸기
-     */
     private final VideoService videoService;
     private final CommentService commentService;
     private final LikeService likeService;

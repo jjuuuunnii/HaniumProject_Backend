@@ -25,11 +25,6 @@ public class UserRepository {
 
     private final EntityManager em;
 
-    //save
-    //findById
-    //findAll
-    //deleteById
-
     public Long save(User user) {
         log.info("save user = {}", user);
         em.persist(user);
