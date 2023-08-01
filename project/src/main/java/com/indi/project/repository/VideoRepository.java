@@ -20,30 +20,25 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 @ToString
-@Transactional(readOnly = true)
+
 public class VideoRepository {
 
 
-    //save
-    //findById
-    //findAll
-    //deleteById
-
     private final EntityManager em;
-    @Transactional
+
     public Long save(Video video) {
         log.info("save video = {}", video);
         em.persist(video);
         return video.getId();
     }
 
-    @Transactional(readOnly = true)
+
     public Optional<Video> findById(Long id) {
         Video video = em.find(Video.class, id);
         return Optional.ofNullable(video);
     }
 
-    @Transactional(readOnly = true)
+
     public List<Video> findByGenre(Genre genre) {
         List<Video> videos = em.createQuery("select v from Video v where v.genre = :genre", Video.class)
                 .setParameter("genre", genre)
@@ -56,7 +51,7 @@ public class VideoRepository {
     }
 
 
-    @Transactional
+
     public void deleteById(Long id) {
         Optional<Video> video = findById(id);
         video.ifPresentOrElse(

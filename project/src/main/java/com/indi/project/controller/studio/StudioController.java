@@ -1,8 +1,8 @@
 package com.indi.project.controller.studio;
 
-import com.indi.project.Result;
-import com.indi.project.SuccessCode;
-import com.indi.project.SuccessObject;
+import com.indi.project.success.Result;
+import com.indi.project.success.SuccessCode;
+import com.indi.project.success.SuccessObject;
 import com.indi.project.dto.studio.UserVideoListDto;
 import com.indi.project.dto.studio.VideoJoinDto;
 import com.indi.project.service.studio.StudioService;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

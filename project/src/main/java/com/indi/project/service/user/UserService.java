@@ -21,7 +21,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UserService {
 
-    @Value("{file.dir.profile}")
+    @Value("${file.dir.profile}")
     private final String fileDir;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

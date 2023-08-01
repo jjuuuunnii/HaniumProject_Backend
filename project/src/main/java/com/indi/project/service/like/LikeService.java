@@ -27,9 +27,10 @@ public class LikeService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void saveLikes(Long videoId, LikesDto likesDto) {
+    public boolean saveLikes(Long videoId, LikesDto likesDto) {
+
         Like like = Like.builder()
-                .likeStatus(likesDto.isLikeStatus())
+                .likeStatus(false)
                 .build();
 
         Video video = videoRepository.findById(videoId).orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
@@ -37,9 +38,9 @@ public class LikeService {
 
         like.setUser(user);
         like.setVideo(video);
-
         video.getLikes().add(like);
-        user.getLikes().add(like);
-        likeRepository.save(like);
+        user.getLikes().add(like);  //양방향 연관관계 설정
+
+        return likeRepository.save(like);
     }
 }

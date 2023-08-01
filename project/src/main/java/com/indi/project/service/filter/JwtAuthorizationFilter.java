@@ -21,14 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-/**
- * TODO
- * <p>
- * 일단 여기서  Transaction구현 해야할듯하고 Refresh Token도 어떻게 해결해야함
- * 그리고  SecurityConfig에 추가해야돼
- */
-
-
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 

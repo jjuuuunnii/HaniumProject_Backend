@@ -1,5 +1,8 @@
 package com.indi.project.entity;
 
+import com.indi.project.dto.user.req.FollowingDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +11,8 @@ import javax.persistence.*;
 @Entity
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 public class Follow {
 
     @Id
@@ -23,4 +28,22 @@ public class Follow {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "followed_user_id")
     private User followedUser;
+
+    public Follow(){}
+
+    public void setFollowingUser(User user) {
+        if(this.followingUser != null) {
+            this.followingUser.getFollowings().remove(this);
+        }
+        this.followingUser = user;
+        user.getFollowings().add(this);
+    }
+
+    public void setFollowedUser(User user) {
+        if(this.followedUser != null) {
+            this.followedUser.getFollowers().remove(this);
+        }
+        this.followedUser = user;
+        user.getFollowers().add(this);
+    }
 }

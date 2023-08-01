@@ -85,4 +85,15 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
+    public void addFollowing(Follow follow) {
+        this.followings.add(follow);
+        follow.setFollowingUser(this);
+    }
+
+    public void addFollower(Follow follow) {
+        this.followers.add(follow);
+        follow.setFollowedUser(this);
+    }
 }

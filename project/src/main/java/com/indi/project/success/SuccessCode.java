@@ -1,4 +1,4 @@
-package com.indi.project;
+package com.indi.project.success;
 
 import lombok.Getter;
 
@@ -9,6 +9,7 @@ public enum SuccessCode {
     LIKE_STATUS_POSTED(true, "LIKE STATUS POSTED"),
     VIDEO_POSTED(true, "VIDEO POSTED"),
     VIEW_INCREASED_POSTED(true, "VIEW INCREASE POSTED"),
+    FOLLOW_POSTED(true, "FOLLOW POSTED"),
     COMMENT_DELETED(true, "COMMENT DELETED");
 
     private final boolean success;

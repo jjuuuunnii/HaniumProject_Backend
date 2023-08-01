@@ -1,4 +1,4 @@
-package com.indi.project.dto.user.res;
+package com.indi.project.dto.user.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,11 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class FollowingDto {
-
     private String loginId;
-
-    private String nickName;
-
-    private String profileImageUrl;
-
+    private boolean followStatus;
 }

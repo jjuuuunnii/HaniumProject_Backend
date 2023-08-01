@@ -1,17 +1,13 @@
 package com.indi.project.service.video;
 
-import com.indi.project.dto.commet.req.CommentDeleteReqDto;
-import com.indi.project.dto.commet.req.CommentReqDto;
-import com.indi.project.dto.like.LikesDto;
+import com.indi.project.dto.user.req.FollowingDto;
 import com.indi.project.dto.video.VideoGetDto;
 import com.indi.project.dto.video.VideoListDto;
-import com.indi.project.entity.Comment;
-import com.indi.project.entity.Genre;
-import com.indi.project.entity.User;
-import com.indi.project.entity.Video;
+import com.indi.project.entity.*;
 import com.indi.project.exception.CustomException;
 import com.indi.project.exception.ErrorCode;
 import com.indi.project.repository.CommentRepository;
+import com.indi.project.repository.FollowRepository;
 import com.indi.project.repository.UserRepository;
 import com.indi.project.repository.VideoRepository;
 import com.indi.project.service.json.JsonService;
@@ -34,6 +30,7 @@ public class VideoService {
     private final VideoRepository videoRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     public VideoGetDto getVideo(Long id) {
         return videoRepository.findById(id)
@@ -49,10 +46,12 @@ public class VideoService {
         return getVideoListDtos(byGenre);
     }
 
+    @Transactional
     public void increaseViews(Long videoId) {
         Video video = videoRepository.findById(videoId).orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
         video.increaseViewCnt();
     }
+
 
 
     private static List<VideoListDto> getVideoListDtos(List<Video> byGenre) {

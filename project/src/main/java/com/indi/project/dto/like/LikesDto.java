@@ -9,5 +9,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LikesDto {
     private String loginId;
-    private boolean likeStatus;
 }

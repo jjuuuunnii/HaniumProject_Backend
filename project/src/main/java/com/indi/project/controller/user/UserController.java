@@ -1,9 +1,8 @@
 package com.indi.project.controller.user;
 
-import com.indi.project.Result;
+import com.indi.project.success.Result;
 import com.indi.project.dto.user.req.UserJoinReqDto;
 import com.indi.project.dto.user.res.UserJoinResDto;
-import com.indi.project.dto.user.res.UserLogoutResDto;
 import com.indi.project.service.json.JsonService;
 import com.indi.project.service.jwt.JwtService;
 import com.indi.project.service.user.UserService;

@@ -17,12 +17,11 @@ import java.util.Optional;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CommentRepository {
 
     private final EntityManager em;
 
-    @Transactional
+
     public Long save(Comment comment) {
         log.info("save comment = {}", comment);
         em.persist(comment);
@@ -35,7 +34,7 @@ public class CommentRepository {
                 .getResultList();
     }
 
-    @Transactional
+
     public void deleteComments(Long videoId, Long userId, LocalDateTime localDateTime) {
         log.info("Deleting comments for user with id = {} and videoId = {} at {}", userId, videoId, localDateTime);
         int deletedCount = em.createQuery("delete from Comment c where c.user.id = :userId and c.video.id = :videoId and c.createAt = :localDateTime")

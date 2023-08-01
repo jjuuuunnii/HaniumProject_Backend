@@ -26,6 +26,8 @@ public enum ErrorCode {
     //500
     AUTHENTICATION_ERROR_NO_USER(false,"AUTHENTICATION ERROR NO USER"),
     STORE_FILES_FAILS(false,"STORE FILES_FAILS"),
+    CANNOT_FOLLOW_SELF(false,"CANNOT FOLLOW SELF"),
+    DATABASE_ERROR(false, "DATABASE ERROR"),
     LOGOUT_FAILED(false, "LOGIN FAILED");
 
     private final boolean success;

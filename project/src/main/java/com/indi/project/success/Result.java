@@ -1,4 +1,4 @@
-package com.indi.project;
+package com.indi.project.success;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
