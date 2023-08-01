@@ -17,6 +17,8 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -58,7 +60,16 @@ public class UserController {
 
     @PutMapping("/auth/edit/{loginId}")
     public Result<SuccessObject> editUserInfo(@PathVariable String loginId,
-                                              @RequestPart UserEditInfoDto userEditInfoDto) {
+                                              @RequestPart String name,
+                                              @RequestPart String nickName,
+                                              @RequestPart MultipartFile profileImage
+                                              ) {
+        UserEditInfoDto userEditInfoDto = UserEditInfoDto.builder()
+                .name(name)
+                .nickName(nickName)
+                .profileImage(profileImage)
+                .build();
+
         userService.editUserInfo(loginId,userEditInfoDto);
         return new Result<>(new SuccessObject(SuccessCode.USER_EDITED.isSuccess(), SuccessCode.USER_EDITED.getCode()));
     }

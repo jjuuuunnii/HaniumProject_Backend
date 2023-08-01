@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -31,6 +32,20 @@ public class LikeRepository {
         }
 
         return existingLikes.get(0).isLikeStatus();
+    }
+
+    public Optional<Like> findByUserIdAndVideoId(Long userId, Long videoId) {
+        List<Like> results = em.createQuery(
+                        "select l from Like l where l.user.id = :userId and l.video.id = :videoId", Like.class)
+                .setParameter("userId", userId)
+                .setParameter("videoId", videoId)
+                .getResultList();
+
+        if(results.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(results.get(0));
+        }
     }
 
 }

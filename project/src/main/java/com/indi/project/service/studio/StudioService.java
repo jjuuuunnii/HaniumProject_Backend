@@ -73,7 +73,7 @@ public class StudioService {
                         .likes(video.totalLikesCnt())
                         .views(video.getViews())
                         .nickName(user.getNickName())
-                        .uploadDateTime(video.getCreatedAt())
+                        .uploadDateTime(video.getCreatedAt().toString())
                         .genre(video.getGenre().toString())
                         .build())
                 .collect(Collectors.toList());
@@ -117,9 +117,9 @@ public class StudioService {
     private Video getVideo(VideoJoinDto videoJoinDto, String loginId, String videoFilePath, String thumbNailFilePath) {
         Video video = Video.builder()
                 .user(userRepository.findByLoginId(loginId).get())
-                .genre(Genre.valueOf(videoJoinDto.getGenre()))
+                .genre(Genre.fromString(videoJoinDto.getGenre()))
                 .videoPath(videoFilePath)
-                .videoPath(thumbNailFilePath)
+                .thumbNailPath(thumbNailFilePath)
                 .title(videoJoinDto.getTitle())
                 .views(0)
                 .createdAt(LocalDateTime.now())

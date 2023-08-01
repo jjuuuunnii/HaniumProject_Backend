@@ -19,16 +19,6 @@ public class UserJoinReqDto {
 
     @NotBlank(message = "{NOT_BLANK_PASSWORD}")
     private String password;
-
-    public User toEntity(String password){
-        return User.builder()
-                .name(name)
-                .nickName(nickName)
-                .loginId(loginId)
-                .password(password)
-                .createAt(LocalDateTime.now())
-                .build();
-    }
 }
 
 

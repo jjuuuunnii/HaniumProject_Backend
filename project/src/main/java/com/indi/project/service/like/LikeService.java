@@ -29,18 +29,32 @@ public class LikeService {
     @Transactional
     public boolean saveLikes(Long videoId, LikesDto likesDto) {
 
-        Like like = Like.builder()
-                .likeStatus(false)
-                .build();
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
+        User user = userRepository.findByLoginId(likesDto.getLoginId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Video video = videoRepository.findById(videoId).orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
-        User user = userRepository.findByLoginId(likesDto.getLoginId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Optional<Like> existingLikeOpt = likeRepository.findByUserIdAndVideoId(user.getId(), video.getId());
 
-        like.setUser(user);
-        like.setVideo(video);
-        video.getLikes().add(like);
-        user.getLikes().add(like);  //양방향 연관관계 설정
+        if(existingLikeOpt.isPresent()) {
+            // 이미 존재하는 좋아요 - 좋아요 상태를 변경
+            Like existingLike = existingLikeOpt.get();
+            existingLike.setLikeStatus(!existingLike.isLikeStatus());
+            return existingLike.isLikeStatus();
+        } else {
+            // 새로운 좋아요 - 좋아요 객체를 생성하고 저장
+            Like like = Like.builder()
+                    .user(user)
+                    .video(video)
+                    .likeStatus(true)
+                    .build();
 
-        return likeRepository.save(like);
+            video.getLikes().add(like);
+            user.getLikes().add(like);  //양방향 연관관계 설정
+
+            likeRepository.save(like);
+            return true;
+        }
     }
+
 }

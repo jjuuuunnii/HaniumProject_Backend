@@ -9,5 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FollowingDto {
     private String loginId;
-    private boolean followStatus;
+
+    public FollowingDto(){}
 }

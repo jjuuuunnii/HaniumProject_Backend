@@ -1,15 +1,14 @@
-package com.indi.project.dto.user.req;
+package com.indi.project.dto.studio;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
-public class UserLeaveDto {
+public class VideoDeleteDto {
     private String loginId;
-    public UserLeaveDto(){}
+
+    public VideoDeleteDto(){}
 }

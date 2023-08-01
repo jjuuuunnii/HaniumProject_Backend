@@ -19,7 +19,7 @@ public class UserVideoListDto {
     private int likes;
     private int views;
     private String nickName;
-    private LocalDateTime uploadDateTime;
+    private String uploadDateTime;
     private String genre;
 
     public UserVideoListDto(){}

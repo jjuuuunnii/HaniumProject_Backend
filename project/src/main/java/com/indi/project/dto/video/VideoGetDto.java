@@ -17,10 +17,10 @@ public class VideoGetDto {
     private int likes;
     private String loginId;
     private int views;
-    private List<Comment> comments;
+    private List<CommentDto> comments;
     private String videoUrl;
     private String profileImageUrl;
-    private LocalDateTime time;
+    private String time;
 
     public VideoGetDto(){}
 }

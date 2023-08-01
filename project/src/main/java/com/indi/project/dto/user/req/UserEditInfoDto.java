@@ -1,9 +1,8 @@
 package com.indi.project.dto.user.req;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.indi.project.entity.User;
+import lombok.*;
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
@@ -17,4 +16,5 @@ public class UserEditInfoDto {
     private MultipartFile profileImage;
 
     public UserEditInfoDto(){}
+
 }

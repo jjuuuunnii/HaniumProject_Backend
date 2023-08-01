@@ -21,4 +21,17 @@ public enum Genre {
     Genre(String genre) {
         this.genre = genre;
     }
+
+    public String getGenre() {
+        return this.genre;
+    }
+
+    public static Genre fromString(String genre) {
+        for (Genre g : Genre.values()) {
+            if (g.getGenre().equalsIgnoreCase(genre)) {
+                return g;
+            }
+        }
+        throw new IllegalArgumentException("No constant with genre " + genre + " found");
+    }
 }

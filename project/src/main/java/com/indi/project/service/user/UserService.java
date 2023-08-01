@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,15 +32,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ToString
 @Transactional(readOnly = true)
 public class UserService {
 
     @Value("${file.dir.profile}")
-    private final String fileDir;
+    private String fileDir;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final StudioService studioService;
 
     @Transactional
     public UserJoinResDto joinUser(UserJoinReqDto userJoinReqDto) {
@@ -79,6 +78,7 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
     public void leaveUser(UserLeaveDto userLeaveDto) {
         User user = findUserByLoginId(userLeaveDto.getLoginId());
         userRepository.deleteById(user.getId());
@@ -90,6 +90,9 @@ public class UserService {
 
         user.setName(userEditInfoDto.getName());
         user.setNickName(userEditInfoDto.getNickName());
+        if(userEditInfoDto.getProfileImage() == null){
+            return;
+        }
 
         if(userEditInfoDto.getProfileImage() != null && !userEditInfoDto.getProfileImage().isEmpty()){
             String oldProfileImageUrl = user.getProfileImageUrl();
@@ -127,7 +130,7 @@ public class UserService {
 
 
     private static String getFileName(MultipartFile videoFile) {
-        String videoFileName = UUID.randomUUID().toString() + "_" + videoFile.getOriginalFilename();
+        String videoFileName = UUID.randomUUID() + "_" + videoFile.getOriginalFilename();
         return videoFileName;
     }
 
@@ -137,6 +140,7 @@ public class UserService {
                 .password(passwordEncoder.encode(userJoinReqDto.getPassword()))
                 .nickName(userJoinReqDto.getNickName())
                 .name(userJoinReqDto.getName())
+                .createAt(LocalDateTime.now())
                 .profileImageUrl(fileDir + "defaultProfile.png")
                 .build();
     }

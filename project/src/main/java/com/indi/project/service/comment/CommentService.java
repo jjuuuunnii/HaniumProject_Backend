@@ -5,6 +5,7 @@ import com.indi.project.dto.commet.req.CommentReqDto;
 import com.indi.project.dto.like.LikesDto;
 import com.indi.project.entity.Comment;
 import com.indi.project.entity.User;
+import com.indi.project.entity.Video;
 import com.indi.project.exception.CustomException;
 import com.indi.project.exception.ErrorCode;
 import com.indi.project.repository.CommentRepository;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -27,6 +29,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final VideoRepository videoRepository;
     private final UserRepository userRepository;
+    private final DateTimeFormatter formatter;
 
     @Transactional
     public void saveComments(Long id, CommentReqDto commentReqDto) {
@@ -41,7 +44,7 @@ public class CommentService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        commentRepository.deleteComments(videoId, user.get().getId(), commentDeleteReqDto.getTime());
+        commentRepository.deleteComments(videoId, user.get().getId(), LocalDateTime.parse(commentDeleteReqDto.getTime(), formatter));
     }
 
     private Comment commentDtoToComment(Long id, CommentReqDto commentReqDto, User user) {
@@ -50,9 +53,13 @@ public class CommentService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        comment.setUser(user);
-        comment.setVideo(videoRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND)));
+        Video video = videoRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
+        video.getComments().add(comment);
         user.getComments().add(comment);
+        comment.setUser(user);
+        comment.setVideo(video);
+
+
         return comment;
     }
 }

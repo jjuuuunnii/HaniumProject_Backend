@@ -1,17 +1,17 @@
-package com.indi.project.dto.commet.req;
+package com.indi.project.dto.video;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
-public class CommentDeleteReqDto {
+public class CommentDto {
     private String loginId;
+    private String content;
     private String time;
-
-    public CommentDeleteReqDto(){}
+    private String profileImageUrl;
 }

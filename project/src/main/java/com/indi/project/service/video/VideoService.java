@@ -1,6 +1,7 @@
 package com.indi.project.service.video;
 
 import com.indi.project.dto.user.req.FollowingDto;
+import com.indi.project.dto.video.CommentDto;
 import com.indi.project.dto.video.VideoGetDto;
 import com.indi.project.dto.video.VideoListDto;
 import com.indi.project.entity.*;
@@ -79,9 +80,17 @@ public class VideoService {
                 .likes(video.totalLikesCnt())
                 .loginId(video.getUser().getLoginId())
                 .views(video.getViews())
-                .comments(video.getComments())
+                .videoUrl(video.getVideoPath())
+                .comments(video.getComments().stream()
+                        .map(comment -> new CommentDto(
+                                comment.getUser().getLoginId(),
+                                comment.getContent(),
+                                comment.getCreateAt().toString(),
+                                comment.getUser().getProfileImageUrl())
+                        )
+                        .collect(Collectors.toList()))
                 .profileImageUrl(video.getUser().getProfileImageUrl())
-                .time(LocalDateTime.now())
+                .time(LocalDateTime.now().toString())
                 .build();
     }
 }
