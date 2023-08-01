@@ -71,7 +71,7 @@ public class StudioService {
                         .videoTitle(video.getTitle())
                         .videoFilePath(video.getVideoPath())
                         .likes(video.totalLikesCnt())
-                        .views(video.getViews())
+                        .views(video.getViews().size())
                         .nickName(user.getNickName())
                         .uploadDateTime(video.getCreatedAt().toString())
                         .genre(video.getGenre().toString())
@@ -121,7 +121,6 @@ public class StudioService {
                 .videoPath(videoFilePath)
                 .thumbNailPath(thumbNailFilePath)
                 .title(videoJoinDto.getTitle())
-                .views(0)
                 .createdAt(LocalDateTime.now())
                 .build();
         return video;

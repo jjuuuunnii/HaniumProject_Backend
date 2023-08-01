@@ -37,10 +37,12 @@ public class Video {
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
     private List<Like> likes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
+    private List<View> views = new ArrayList<>();
+
     private String videoPath;
     private String thumbNailPath;
     private String title;
-    private int views;
     private LocalDateTime createdAt;
 
     //private int viewsByTime;
@@ -48,11 +50,6 @@ public class Video {
     public Video(){}
     public int totalLikesCnt(){
         return likes.size();
-    }
-
-    public void increaseViewCnt(){
-        int result = getViews();
-        setViews(result);
     }
 
 

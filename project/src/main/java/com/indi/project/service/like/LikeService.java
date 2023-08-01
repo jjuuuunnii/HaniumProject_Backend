@@ -28,7 +28,6 @@ public class LikeService {
 
     @Transactional
     public boolean saveLikes(Long videoId, LikesDto likesDto) {
-
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
         User user = userRepository.findByLoginId(likesDto.getLoginId())
@@ -37,16 +36,17 @@ public class LikeService {
         Optional<Like> existingLikeOpt = likeRepository.findByUserIdAndVideoId(user.getId(), video.getId());
 
         if(existingLikeOpt.isPresent()) {
-            // 이미 존재하는 좋아요 - 좋아요 상태를 변경
+            // 이미 존재하는 좋아요 - 좋아요를 삭제
             Like existingLike = existingLikeOpt.get();
-            existingLike.setLikeStatus(!existingLike.isLikeStatus());
-            return existingLike.isLikeStatus();
+            video.getLikes().remove(existingLike);
+            user.getLikes().remove(existingLike); //양방향 연관관계 설정 해제
+            likeRepository.deleteByUserIdAndVideoId(user.getId(), video.getId());
+            return false;
         } else {
             // 새로운 좋아요 - 좋아요 객체를 생성하고 저장
             Like like = Like.builder()
                     .user(user)
                     .video(video)
-                    .likeStatus(true)
                     .build();
 
             video.getLikes().add(like);
@@ -56,5 +56,7 @@ public class LikeService {
             return true;
         }
     }
+
+
 
 }

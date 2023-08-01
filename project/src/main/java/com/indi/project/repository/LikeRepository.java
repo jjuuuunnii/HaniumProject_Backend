@@ -16,22 +16,8 @@ public class LikeRepository {
 
     private final EntityManager em;
 
-    public boolean save(Like like){
-        List<Like> existingLikes = em.createQuery(
-                        "select l from Like l where l.video.id = :videoId and l.user.id = :userId", Like.class)
-                .setParameter("videoId", like.getVideo().getId())
-                .setParameter("userId", like.getUser().getId())
-                .getResultList();
-
-        if(existingLikes.isEmpty()){
-            like.setLikeStatus(true);
-            em.persist(like);
-        }else{
-            Like existingLike = existingLikes.get(0);
-            existingLike.setLikeStatus(!existingLike.isLikeStatus());
-        }
-
-        return existingLikes.get(0).isLikeStatus();
+    public void save(Like like){
+        em.persist(like);
     }
 
     public Optional<Like> findByUserIdAndVideoId(Long userId, Long videoId) {
@@ -45,6 +31,13 @@ public class LikeRepository {
             return Optional.empty();
         } else {
             return Optional.of(results.get(0));
+        }
+    }
+
+    public void deleteByUserIdAndVideoId(Long userId, Long videoId) {
+        Optional<Like> likeOpt = findByUserIdAndVideoId(userId, videoId);
+        if(likeOpt.isPresent()) {
+            em.remove(likeOpt.get());
         }
     }
 

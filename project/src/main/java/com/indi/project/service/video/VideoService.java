@@ -7,10 +7,7 @@ import com.indi.project.dto.video.VideoListDto;
 import com.indi.project.entity.*;
 import com.indi.project.exception.CustomException;
 import com.indi.project.exception.ErrorCode;
-import com.indi.project.repository.CommentRepository;
-import com.indi.project.repository.FollowRepository;
-import com.indi.project.repository.UserRepository;
-import com.indi.project.repository.VideoRepository;
+import com.indi.project.repository.*;
 import com.indi.project.service.json.JsonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +26,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class VideoService {
     private final VideoRepository videoRepository;
-    private final CommentRepository commentRepository;
+    private final ViewRepository viewRepository;
     private final UserRepository userRepository;
-    private final FollowRepository followRepository;
 
     public VideoGetDto getVideo(Long id) {
         return videoRepository.findById(id)
@@ -48,9 +44,19 @@ public class VideoService {
     }
 
     @Transactional
-    public void increaseViews(Long videoId) {
+    public void increaseViews(Long videoId, String loginId) {
         Video video = videoRepository.findById(videoId).orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
-        video.increaseViewCnt();
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        View view = viewRepository.findViewByUserAndVideo(user, video).orElseGet(() -> {
+            View newView = new View();
+            newView.setUser(user);
+            newView.setVideo(video);
+            user.getViews().add(newView);
+            video.getViews().add(newView);
+            viewRepository.save(newView);
+            return newView;
+        });
     }
 
 
@@ -65,7 +71,7 @@ public class VideoService {
                     videoListDto.setLikes(video.totalLikesCnt());
                     videoListDto.setThumbnail(video.getThumbNailPath());
                     videoListDto.setLoginId(video.getUser().getLoginId());
-                    videoListDto.setViews(video.getViews());
+                    videoListDto.setViews(video.getViews().size());
                     videoListDto.setProfileImageUrl(video.getUser().getProfileImageUrl());
 
                     return videoListDto;
@@ -79,7 +85,7 @@ public class VideoService {
                 .title(video.getTitle())
                 .likes(video.totalLikesCnt())
                 .loginId(video.getUser().getLoginId())
-                .views(video.getViews())
+                .views(video.getViews().size())
                 .videoUrl(video.getVideoPath())
                 .comments(video.getComments().stream()
                         .map(comment -> new CommentDto(

@@ -1,5 +1,6 @@
 package com.indi.project.controller.video;
 import com.indi.project.dto.user.req.FollowingDto;
+import com.indi.project.dto.video.GetViewDto;
 import com.indi.project.service.follow.FollowService;
 import com.indi.project.success.Result;
 import com.indi.project.success.SuccessCode;
@@ -74,8 +75,8 @@ public class VideoController {
     }
 
     @PostMapping("/{videoId}/views")
-    public Result<SuccessObject> increaseViews(@PathVariable Long videoId){
-        videoService.increaseViews(videoId);
+    public Result<SuccessObject> increaseViews(@PathVariable Long videoId, @RequestBody GetViewDto getViewDto){
+        videoService.increaseViews(videoId, getViewDto.getLoginId());
         return new Result<>(new SuccessObject(SuccessCode.VIEW_INCREASED_POSTED.isSuccess(), SuccessCode.VIEW_INCREASED_POSTED.getCode()));
     }
 
