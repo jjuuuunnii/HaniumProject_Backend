@@ -2,13 +2,15 @@ package com.indi.project.service.user;
 import com.indi.project.dto.mypage.FollowingListDto;
 import com.indi.project.dto.mypage.LikeListDto;
 import com.indi.project.dto.mypage.GetMyPageDto;
+import com.indi.project.dto.user.req.UserEditInfoDto;
 import com.indi.project.dto.user.req.UserJoinReqDto;
+import com.indi.project.dto.user.req.UserLeaveDto;
 import com.indi.project.dto.user.res.UserJoinResDto;
 import com.indi.project.entity.User;
-import com.indi.project.entity.Video;
 import com.indi.project.exception.CustomException;
 import com.indi.project.exception.ErrorCode;
 import com.indi.project.repository.UserRepository;
+import com.indi.project.service.studio.StudioService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +18,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -32,6 +39,7 @@ public class UserService {
     private final String fileDir;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final StudioService studioService;
 
     @Transactional
     public UserJoinResDto joinUser(UserJoinReqDto userJoinReqDto) {
@@ -40,16 +48,6 @@ public class UserService {
         userRepository.save(user);
         log.info("{} join success", user.getName());
         return new UserJoinResDto(true, "SIGNUP SUCCESS");
-    }
-
-    private User convertDtoToEntity(UserJoinReqDto userJoinReqDto) {
-        return User.builder()
-                .loginId(userJoinReqDto.getLoginId())
-                .password(passwordEncoder.encode(userJoinReqDto.getPassword()))
-                .nickName(userJoinReqDto.getNickName())
-                .name(userJoinReqDto.getName())
-                .profileImageUrl(fileDir + "defaultProfile.png")
-                .build();
     }
 
     public GetMyPageDto getMyPageInfo(String loginId) {
@@ -78,6 +76,68 @@ public class UserService {
                 .following(followingList)
                 .like(likeList)
                 .profileImageUrl(user.getProfileImageUrl())
+                .build();
+    }
+
+    public void leaveUser(UserLeaveDto userLeaveDto) {
+        User user = findUserByLoginId(userLeaveDto.getLoginId());
+        userRepository.deleteById(user.getId());
+    }
+
+    @Transactional
+    public void editUserInfo(String loginId, UserEditInfoDto userEditInfoDto) {
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        user.setName(userEditInfoDto.getName());
+        user.setNickName(userEditInfoDto.getNickName());
+
+        if(userEditInfoDto.getProfileImage() != null && !userEditInfoDto.getProfileImage().isEmpty()){
+            String oldProfileImageUrl = user.getProfileImageUrl();
+            if(oldProfileImageUrl != null) {
+                deleteFile(oldProfileImageUrl);
+            }
+            String newProfileImageUrl = storeFile(userEditInfoDto.getProfileImage());
+            user.setProfileImageUrl(newProfileImageUrl);
+        }
+    }
+
+    @Transactional
+    public String storeFile(MultipartFile file) {
+        try {
+            String fileName = getFileName(file);
+            String filePath = fileDir + File.separator + fileName;
+
+            file.transferTo(new File(filePath));
+
+            return filePath;
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.STORE_FILES_FAILS);
+        }
+    }
+    public boolean deleteFile(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            if (!file.delete()) {
+                throw new CustomException(ErrorCode.FILE_DELETION_FAILED);
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    private static String getFileName(MultipartFile videoFile) {
+        String videoFileName = UUID.randomUUID().toString() + "_" + videoFile.getOriginalFilename();
+        return videoFileName;
+    }
+
+    private User convertDtoToEntity(UserJoinReqDto userJoinReqDto) {
+        return User.builder()
+                .loginId(userJoinReqDto.getLoginId())
+                .password(passwordEncoder.encode(userJoinReqDto.getPassword()))
+                .nickName(userJoinReqDto.getNickName())
+                .name(userJoinReqDto.getName())
+                .profileImageUrl(fileDir + "defaultProfile.png")
                 .build();
     }
 

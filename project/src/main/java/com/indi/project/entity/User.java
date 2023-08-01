@@ -1,11 +1,7 @@
 package com.indi.project.entity;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,7 +29,6 @@ public class User implements UserDetails {
     private LocalDateTime createAt;
     private String refreshToken;
     private String profileImageUrl;
-
 
     @OneToMany(mappedBy = "followingUser", cascade = CascadeType.ALL)
     private List<Follow> followings = new ArrayList<>();

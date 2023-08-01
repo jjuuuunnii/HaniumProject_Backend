@@ -10,6 +10,9 @@ public enum SuccessCode {
     VIDEO_POSTED(true, "VIDEO POSTED"),
     VIEW_INCREASED_POSTED(true, "VIEW INCREASE POSTED"),
     FOLLOW_POSTED(true, "FOLLOW POSTED"),
+    USER_DELETED(true, "USER DELETED"),
+    USER_EDITED(true, "USER EDITED"),
+    VIDEO_DELETED(true, "VIDEO DELETED"),
     COMMENT_DELETED(true, "COMMENT DELETED");
 
     private final boolean success;

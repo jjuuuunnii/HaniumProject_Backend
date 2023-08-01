@@ -2,6 +2,8 @@ package com.indi.project.repository;
 
 import com.indi.project.entity.User;
 import com.indi.project.entity.Video;
+import com.indi.project.exception.CustomException;
+import com.indi.project.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -82,7 +84,7 @@ public class UserRepository {
         user.ifPresentOrElse(
                 em::remove,
                 () -> {
-                    throw new InvalidDataAccessApiUsageException("No user with id " + id);
+                    throw new CustomException(ErrorCode.USER_NOT_FOUND);
                 });
     }
 
@@ -104,10 +106,6 @@ public class UserRepository {
         } else {
             return Optional.ofNullable(resultList.get(0));
         }
-    }
-
-    public Optional<List> findVideosByUserLoginId(String loginId) {
-        return Optional.ofNullable(findByLoginId(loginId).get().getVideos());
     }
 
 }

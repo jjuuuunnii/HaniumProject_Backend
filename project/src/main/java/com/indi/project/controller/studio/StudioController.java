@@ -16,22 +16,29 @@ import java.util.List;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/studio/{loginId}/upload")
+@RequestMapping("/studio")
 public class StudioController {
 
     private final StudioService studioService;
 
-    @GetMapping
+    @GetMapping("/{loginId}/upload")
     public Result<List<UserVideoListDto>> getUserVideoList(@PathVariable String loginId){
         List<UserVideoListDto> userVideoList = studioService.getUserVideoList(loginId);
         return new Result<>(userVideoList);
     }
 
-    @PostMapping
+    @PostMapping("/{loginId}/upload")
     public Result<SuccessObject> joinUserVideo(@RequestPart VideoJoinDto videoJoinDto, @PathVariable String loginId) {
         studioService.joinUserVideo(videoJoinDto, loginId);
         return new Result<>(new SuccessObject(SuccessCode.VIDEO_POSTED.isSuccess(), SuccessCode.VIDEO_POSTED.getCode()));
     }
+
+    @PostMapping("/{videoId}/delete")
+    public Result<SuccessObject> deleteVideo(@RequestBody String loginId, @PathVariable Long videoId) {
+        studioService.deleteUserVideo(loginId, videoId);
+        return new Result<>(new SuccessObject(SuccessCode.VIDEO_DELETED.isSuccess(), SuccessCode.VIDEO_DELETED.getCode()));
+    }
+
 
 
 }
