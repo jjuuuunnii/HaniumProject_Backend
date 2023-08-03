@@ -1,5 +1,6 @@
 package com.indi.project.service.studio;
 import com.indi.project.dto.studio.UserVideoListDto;
+import com.indi.project.dto.studio.VideoDeleteDtoV2;
 import com.indi.project.dto.studio.VideoJoinDto;
 import com.indi.project.entity.Genre;
 import com.indi.project.entity.User;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -79,7 +81,7 @@ public class StudioService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+   /* @Transactional
     public void deleteUserVideo(String loginId, Long videoId) {
         // Confirm the user exists
         User user = userRepository.findByLoginId(loginId)
@@ -100,8 +102,45 @@ public class StudioService {
 
         // Delete the video from the database
         videoRepository.deleteById(video.getId());
+    }*/
+
+
+
+    public void deleteUserVideoV2(String loginId, VideoDeleteDtoV2 videoDeleteDtoV2) {
+        List<Long> videoIds = videoDeleteDtoV2.getVideoIds();
+
+        // Confirm the user exists
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        for (Long videoId : videoIds) {
+            try {
+                deleteVideo(user, videoId);
+            } catch (CustomException e) {
+                // Log the exception for further investigation
+                throw new CustomException(ErrorCode.DELETE_VIDEOS_FAILED);
+            }
+        }
     }
 
+    @Transactional
+    public void deleteVideo(User user, Long videoId) {
+        // Confirm the video exists
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
+
+        // Confirm the user is the owner of the video
+        if (!video.getUser().equals(user)) {
+            throw new CustomException(ErrorCode.PERMISSION_DENIED);
+        }
+
+        // Delete the video file and thumbnail file
+        deleteFile(video.getVideoPath());
+        deleteFile(video.getThumbNailPath());
+
+        // Delete the video from the database
+        videoRepository.deleteById(video.getId());
+    }
 
     public boolean deleteFile(String filePath) {
         File file = new File(filePath);
@@ -113,6 +152,9 @@ public class StudioService {
         }
         return false;
     }
+
+
+
 
     private Video getVideo(VideoJoinDto videoJoinDto, String loginId, String videoFilePath, String thumbNailFilePath) {
         Video video = Video.builder()
