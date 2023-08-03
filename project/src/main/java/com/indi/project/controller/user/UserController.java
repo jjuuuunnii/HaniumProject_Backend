@@ -35,31 +35,31 @@ public class UserController {
     private final VideoService videoService;
 
     @PostMapping("/auth/signup")
-    public Result<UserJoinResDto> joinUser(@Validated @RequestBody UserJoinReqDto userJoinReqDto) {
+    public UserJoinResDto joinUser(@Validated @RequestBody UserJoinReqDto userJoinReqDto) {
         log.info("userJoinReqDto={}", userJoinReqDto.toString());
 
-        return new Result<>(userService.joinUser(userJoinReqDto));
+        return userService.joinUser(userJoinReqDto);
     }
 
-    @PutMapping("/auth/logout")
-    public void logoutUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @PostMapping("/auth/logout")
+    public SuccessObject logoutUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         jwtService.logout(request);
-        jsonService.responseToJson(response, HttpServletResponse.SC_OK, true, "LOGOUT SUCCESS");
+        return new SuccessObject(SuccessCode.LOGOUT_SUCCESS.isSuccess(), SuccessCode.LOGOUT_SUCCESS.getCode());
     }
 
     @GetMapping("/mypage/{loginId}")
-    public Result<GetMyPageDto> getMypageInfo(@PathVariable String loginId) {
-        return new Result<>(userService.getMyPageInfo(loginId));
+    public GetMyPageDto getMypageInfo(@PathVariable String loginId) {
+        return userService.getMyPageInfo(loginId);
     }
 
     @PostMapping("/auth/leave")
-    public Result<SuccessObject> leave(@RequestBody UserLeaveDto userLeaveDto){
+    public SuccessObject leave(@RequestBody UserLeaveDto userLeaveDto){
         userService.leaveUser(userLeaveDto);
-        return new Result<>(new SuccessObject(SuccessCode.USER_DELETED.isSuccess(), SuccessCode.USER_DELETED.getCode()));
+        return new SuccessObject(SuccessCode.USER_DELETED.isSuccess(), SuccessCode.USER_DELETED.getCode());
     }
 
     @PutMapping("/auth/edit/{loginId}")
-    public Result<SuccessObject> editUserInfo(@PathVariable String loginId,
+    public SuccessObject editUserInfo(@PathVariable String loginId,
                                               @RequestPart String name,
                                               @RequestPart String nickName,
                                               @RequestPart MultipartFile profileImage
@@ -71,6 +71,10 @@ public class UserController {
                 .build();
 
         userService.editUserInfo(loginId,userEditInfoDto);
-        return new Result<>(new SuccessObject(SuccessCode.USER_EDITED.isSuccess(), SuccessCode.USER_EDITED.getCode()));
+        return new SuccessObject(SuccessCode.USER_EDITED.isSuccess(), SuccessCode.USER_EDITED.getCode());
     }
 }
+
+
+
+

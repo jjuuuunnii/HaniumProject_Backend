@@ -25,13 +25,13 @@ public class StudioController {
     private final StudioService studioService;
 
     @GetMapping("/{loginId}/upload")
-    public Result<List<UserVideoListDto>> getUserVideoList(@PathVariable String loginId){
+    public List<UserVideoListDto> getUserVideoList(@PathVariable String loginId){
         List<UserVideoListDto> userVideoList = studioService.getUserVideoList(loginId);
-        return new Result<>(userVideoList);
+        return userVideoList;
     }
 
     @PostMapping("/{loginId}/upload")
-    public Result<SuccessObject> joinUserVideo(@RequestPart MultipartFile videoFile,
+    public SuccessObject joinUserVideo(@RequestPart MultipartFile videoFile,
                                                @RequestPart MultipartFile thumbNail,
                                                @RequestPart String title,
                                                @RequestPart String genre,
@@ -44,7 +44,7 @@ public class StudioController {
                 .build();
 
         studioService.joinUserVideo(videoJoinDto, loginId);
-        return new Result<>(new SuccessObject(SuccessCode.VIDEO_POSTED.isSuccess(), SuccessCode.VIDEO_POSTED.getCode()));
+        return new SuccessObject(SuccessCode.VIDEO_POSTED.isSuccess(), SuccessCode.VIDEO_POSTED.getCode());
     }
 
 /*    @DeleteMapping("/{videoId}/delete")
@@ -55,11 +55,8 @@ public class StudioController {
     }*/
 
     @DeleteMapping("/{loginId}/delete")
-    public Result<SuccessObject> deleteVideoV2(@RequestBody VideoDeleteDtoV2 videoDeleteDtoV2, @PathVariable String loginId) {
+    public SuccessObject deleteVideoV2(@RequestBody VideoDeleteDtoV2 videoDeleteDtoV2, @PathVariable String loginId) {
         studioService.deleteUserVideoV2(loginId, videoDeleteDtoV2);
-        return new Result<>(new SuccessObject(SuccessCode.VIDEO_DELETED.isSuccess(), SuccessCode.VIDEO_DELETED.getCode()));
+        return new SuccessObject(SuccessCode.VIDEO_DELETED.isSuccess(), SuccessCode.VIDEO_DELETED.getCode());
     }
-
-
-
 }

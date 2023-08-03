@@ -47,8 +47,9 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 }
-/*
-def frontendDir = "$projectDir/src/main/frontend"
+
+// + React
+def frontendDir = "$projectDir/src/main/HaniumProject_Frontend"
 
 sourceSets {
 	main {
@@ -87,4 +88,5 @@ task copyReactBuildFiles(type: Copy) {
 	dependsOn "buildReact"
 	from "$frontendDir/build"
 	into "$projectDir/src/main/resources/static"
-}*/
+}
+// - React

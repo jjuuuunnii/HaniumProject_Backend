@@ -13,6 +13,7 @@ public enum SuccessCode {
     USER_DELETED(true, "USER DELETED"),
     USER_EDITED(true, "USER EDITED"),
     VIDEO_DELETED(true, "VIDEO DELETED"),
+    LOGOUT_SUCCESS(true, "LOGOUT SUCCESS"),
     COMMENT_DELETED(true, "COMMENT DELETED");
 
     private final boolean success;
