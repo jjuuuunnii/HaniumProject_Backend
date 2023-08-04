@@ -22,5 +22,7 @@ public class VideoGetDto {
     private String profileImageUrl;
     private String time;
 
-    public VideoGetDto(){}
+    public VideoGetDto(){
+
+    }
 }
