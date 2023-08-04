@@ -32,13 +32,13 @@ public class StudioController {
 
     @PostMapping("/{loginId}/upload")
     public SuccessObject joinUserVideo(@RequestPart MultipartFile videoFile,
-                                               @RequestPart MultipartFile thumbNail,
-                                               @RequestPart String title,
-                                               @RequestPart String genre,
+                                               @RequestPart MultipartFile thumbnail,
+                                               @RequestParam String title,
+                                               @RequestParam String genre,
                                                @PathVariable String loginId) {
         VideoJoinDto videoJoinDto = VideoJoinDto.builder()
                 .videoFile(videoFile)
-                .thumbNail(thumbNail)
+                .thumbNail(thumbnail)
                 .title(title)
                 .genre(genre)
                 .build();

@@ -12,6 +12,7 @@ import com.indi.project.repository.VideoRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class StudioService {
     private final VideoRepository videoRepository;
@@ -50,6 +52,8 @@ public class StudioService {
 
             String videoFilePath = videoFileDir + File.separator + videoFileName;
             String thumbNailFilePath = thumbNailDir + File.separator + thumbNailFileName;
+            log.info("videoFilePath = {}",videoFilePath);
+            log.info("thumbNailFilePath = {}",thumbNailFilePath);
 
             videoFile.transferTo(new File(videoFilePath));
             thumbNail.transferTo(new File(thumbNailFilePath));
