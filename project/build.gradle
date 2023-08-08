@@ -36,6 +36,7 @@ dependencies {
 	implementation 'org.json:json:20230227'
 // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
+	implementation 'org.postgresql:postgresql'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	compileOnly 'org.projectlombok:lombok'

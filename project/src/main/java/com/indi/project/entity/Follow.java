@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class Follow {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "follow_id_seq")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "follow_id_seq")
     @SequenceGenerator(name = "follow_id_seq", sequenceName = "follow_id_seq", initialValue = 1, allocationSize = 50)
     @Column(name = "follow_id")
     private Long id;

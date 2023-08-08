@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class View {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "view_id_seq")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "view_id_seq")
     @SequenceGenerator(name = "view_id_seq", sequenceName = "view_id_seq", initialValue = 1, allocationSize = 50)
     @Column(name = "view_id")
     private Long id;

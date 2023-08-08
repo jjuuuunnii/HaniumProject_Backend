@@ -19,7 +19,7 @@ import java.util.List;
 public class Video {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "video_id_seq")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "video_id_seq")
     @SequenceGenerator(name = "video_id_seq", sequenceName = "video_id_seq", initialValue = 1, allocationSize = 50)
     @Column(name = "video_id")
     private Long id;
