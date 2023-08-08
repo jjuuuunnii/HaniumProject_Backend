@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
@@ -42,13 +41,14 @@ public class UserController {
     }
 
     @PostMapping("/auth/logout")
-    public SuccessObject logoutUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public SuccessObject logoutUser(HttpServletRequest request){
         jwtService.logout(request);
         return new SuccessObject(SuccessCode.LOGOUT_SUCCESS.isSuccess(), SuccessCode.LOGOUT_SUCCESS.getCode());
     }
 
     @GetMapping("/mypage/{loginId}")
     public GetMyPageDto getMypageInfo(@PathVariable String loginId) {
+
         return userService.getMyPageInfo(loginId);
     }
 
@@ -60,10 +60,10 @@ public class UserController {
 
     @PutMapping("/auth/edit/{loginId}")
     public SuccessObject editUserInfo(@PathVariable String loginId,
-                                              @RequestPart String name,
-                                              @RequestPart String nickName,
+                                              @RequestParam String name,
+                                              @RequestParam String nickName,
                                               @RequestPart MultipartFile profileImage
-                                              ) {
+                                              ) throws IOException {
         UserEditInfoDto userEditInfoDto = UserEditInfoDto.builder()
                 .name(name)
                 .nickName(nickName)

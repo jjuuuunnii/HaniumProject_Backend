@@ -1,4 +1,9 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
   datasource:
     url: jdbc:h2:tcp://localhost/~/indi
     username: sa
@@ -7,10 +12,11 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
-#        show_sql: true
+#        show_sql: truels
+
         format_sql: true
 #        default_batch_fetch_size: 1000 #최적화 옵션
 
@@ -24,6 +30,21 @@ file:
     thumbnail: C:/Users/jake9/indi/thumbNailFile
     profile: C:/Users/jake9/indi/profile
 
+cloud:
+  aws:
+    s3:
+      bucket: indi-bucket
+      profile-folder : profile
+      video-folder: videoFile
+      thumbNail-folder: thumbNailFile
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+    credentials:
+      access-key: AKIAQKMWVNZ6X4DHJDHB
+      secret-key: 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
 
 
 #  file.dir=C:/Users/jake9/Spring/Spring MVC_2/file/

@@ -1,6 +1,11 @@
 package com.indi.project.service.studio;
+
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.indi.project.dto.studio.UserVideoListDto;
-import com.indi.project.dto.studio.VideoDeleteDtoV2;
+import com.indi.project.dto.studio.VideoDeleteDto;
 import com.indi.project.dto.studio.VideoJoinDto;
 import com.indi.project.entity.Genre;
 import com.indi.project.entity.User;
@@ -9,6 +14,7 @@ import com.indi.project.exception.CustomException;
 import com.indi.project.exception.ErrorCode;
 import com.indi.project.repository.UserRepository;
 import com.indi.project.repository.VideoRepository;
+import com.indi.project.service.file.FileService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -17,48 +23,39 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@Getter
-@Setter
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
 public class StudioService {
     private final VideoRepository videoRepository;
     private final UserRepository userRepository;
-    @Value("${file.dir.video}")
+    private final FileService fileService;
+
+    @Value("${cloud.aws.s3.thumbNail-folder}")
+    private String thumbnailDir;
+
+    @Value("${cloud.aws.s3.video-folder}")
     private String videoFileDir;
 
-    @Value("${file.dir.thumbnail}")
-    private String thumbNailDir;
+
 
     @Transactional
     public void joinUserVideo(VideoJoinDto videoJoinDto, String loginId) {
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         try {
+            String videoFilePath = fileService.saveFile(videoJoinDto.getVideoFile(), videoFileDir);
+            String thumbNailFilePath = fileService.saveFile(videoJoinDto.getThumbNail(), thumbnailDir);
 
-            MultipartFile videoFile = videoJoinDto.getVideoFile();
-            MultipartFile thumbNail = videoJoinDto.getThumbNail();
-
-            String videoFileName = getFileName(videoFile);
-            String thumbNailFileName = getFileName(thumbNail);
-
-            String videoFilePath = videoFileDir + File.separator + videoFileName;
-            String thumbNailFilePath = thumbNailDir + File.separator + thumbNailFileName;
-            log.info("videoFilePath = {}",videoFilePath);
-            log.info("thumbNailFilePath = {}",thumbNailFilePath);
-
-            videoFile.transferTo(new File(videoFilePath));
-            thumbNail.transferTo(new File(thumbNailFilePath));
-
-            Video video = getVideo(videoJoinDto, loginId, videoFilePath, thumbNailFilePath);
+            Video video = getVideo(videoJoinDto, user, videoFilePath, thumbNailFilePath);
             videoRepository.save(video);
 
         } catch (IOException e) {
@@ -68,10 +65,7 @@ public class StudioService {
 
     public List<UserVideoListDto> getUserVideoList(String loginId) {
         User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        List<Video> videos = user.getVideos();
-
-        return videos.stream()
+        return user.getVideos().stream()
                 .map(video -> UserVideoListDto.builder()
                         .thumbNailPath(video.getThumbNailPath())
                         .videoTitle(video.getTitle())
@@ -85,95 +79,21 @@ public class StudioService {
                 .collect(Collectors.toList());
     }
 
-   /* @Transactional
-    public void deleteUserVideo(String loginId, Long videoId) {
-        // Confirm the user exists
-        User user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        // Confirm the video exists
-        Video video = videoRepository.findById(videoId)
-                .orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
-
-        // Confirm the user is the owner of the video
-        if (!video.getUser().equals(user)) {
-            throw new CustomException(ErrorCode.PERMISSION_DENIED);
-        }
-
-        // Delete the video file and thumbnail file
-        deleteFile(video.getVideoPath());
-        deleteFile(video.getThumbNailPath());
-
-        // Delete the video from the database
-        videoRepository.deleteById(video.getId());
-    }*/
-
-
-
-    public void deleteUserVideoV2(String loginId, VideoDeleteDtoV2 videoDeleteDtoV2) {
-        List<Long> videoIds = videoDeleteDtoV2.getVideoIds();
-
-        // Confirm the user exists
-        User user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        for (Long videoId : videoIds) {
-            try {
-                deleteVideo(user, videoId);
-            } catch (CustomException e) {
-                // Log the exception for further investigation
-                throw new CustomException(ErrorCode.DELETE_VIDEOS_FAILED);
-            }
+    public void deleteUserVideo(String loginId, VideoDeleteDto videoDeleteDto) {
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        for (Long videoId : videoDeleteDto.getVideoIds()) {
+            fileService.deleteVideo(user, videoId);
         }
     }
 
-    @Transactional
-    public void deleteVideo(User user, Long videoId) {
-        // Confirm the video exists
-        Video video = videoRepository.findById(videoId)
-                .orElseThrow(() -> new CustomException(ErrorCode.VIDEO_NOT_FOUND));
-
-        // Confirm the user is the owner of the video
-        if (!video.getUser().equals(user)) {
-            throw new CustomException(ErrorCode.PERMISSION_DENIED);
-        }
-
-        // Delete the video file and thumbnail file
-        deleteFile(video.getVideoPath());
-        deleteFile(video.getThumbNailPath());
-
-        // Delete the video from the database
-        videoRepository.deleteById(video.getId());
-    }
-
-    public boolean deleteFile(String filePath) {
-        File file = new File(filePath);
-        if (file.exists()) {
-            if (!file.delete()) {
-                throw new CustomException(ErrorCode.FILE_DELETION_FAILED);
-            }
-            return true;
-        }
-        return false;
-    }
-
-
-
-
-    private Video getVideo(VideoJoinDto videoJoinDto, String loginId, String videoFilePath, String thumbNailFilePath) {
-        Video video = Video.builder()
-                .user(userRepository.findByLoginId(loginId).get())
+    private Video getVideo(VideoJoinDto videoJoinDto, User user, String videoFilePath, String thumbNailFilePath) {
+        return Video.builder()
+                .user(user)
                 .genre(Genre.fromString(videoJoinDto.getGenre()))
                 .videoPath(videoFilePath)
                 .thumbNailPath(thumbNailFilePath)
                 .title(videoJoinDto.getTitle())
                 .createdAt(LocalDateTime.now())
                 .build();
-        return video;
-    }
-
-    private static String getFileName(MultipartFile videoFile) {
-        String videoFileName = UUID.randomUUID() + "_" + videoFile.getOriginalFilename();
-        return videoFileName;
     }
 }

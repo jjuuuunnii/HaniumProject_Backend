@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 public class VideoDeleteDto {
-    private String loginId;
+    private List<Long> videoIds;
 
     public VideoDeleteDto(){}
 }

@@ -57,10 +57,9 @@ public class JwtService implements JwtProperties {
     public void logout(HttpServletRequest request) {
         try {
             checkHeaderValid(request);
-            String refreshJwtToken = request
-                    .getHeader(JwtProperties.REFRESH_HEADER_PREFIX)
-                    .replace(JwtProperties.TOKEN_PREFIX, "");
-            removeRefreshToken(refreshJwtToken);
+            removeRefreshToken(getUserByAccessToken(request
+                    .getHeader(JwtProperties.ACCESS_HEADER_PREFIX)
+                    .replace(JwtProperties.TOKEN_PREFIX, "")).getRefreshToken());
         } catch (Exception e) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }

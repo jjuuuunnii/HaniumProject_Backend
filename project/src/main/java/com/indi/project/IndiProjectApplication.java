@@ -12,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SpringBootApplication
 
 public class IndiProjectApplication {
-
+	static {
+		System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "false");
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(IndiProjectApplication.class, args);

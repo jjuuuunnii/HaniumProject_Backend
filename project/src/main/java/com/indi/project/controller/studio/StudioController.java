@@ -1,8 +1,7 @@
 package com.indi.project.controller.studio;
 
+
 import com.indi.project.dto.studio.VideoDeleteDto;
-import com.indi.project.dto.studio.VideoDeleteDtoV2;
-import com.indi.project.success.Result;
 import com.indi.project.success.SuccessCode;
 import com.indi.project.success.SuccessObject;
 import com.indi.project.dto.studio.UserVideoListDto;
@@ -10,7 +9,6 @@ import com.indi.project.dto.studio.VideoJoinDto;
 import com.indi.project.service.studio.StudioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,16 +45,10 @@ public class StudioController {
         return new SuccessObject(SuccessCode.VIDEO_POSTED.isSuccess(), SuccessCode.VIDEO_POSTED.getCode());
     }
 
-/*    @DeleteMapping("/{videoId}/delete")
-    public Result<SuccessObject> deleteVideo(@RequestBody VideoDeleteDto videoDeleteDto, @PathVariable Long videoId) {
-
-        studioService.deleteUserVideo(videoDeleteDto.getLoginId(), videoId);
-        return new Result<>(new SuccessObject(SuccessCode.VIDEO_DELETED.isSuccess(), SuccessCode.VIDEO_DELETED.getCode()));
-    }*/
 
     @DeleteMapping("/{loginId}/delete")
-    public SuccessObject deleteVideoV2(@RequestBody VideoDeleteDtoV2 videoDeleteDtoV2, @PathVariable String loginId) {
-        studioService.deleteUserVideoV2(loginId, videoDeleteDtoV2);
+    public SuccessObject deleteVideo(@RequestBody VideoDeleteDto videoDeleteDto, @PathVariable String loginId) {
+        studioService.deleteUserVideo(loginId, videoDeleteDto);
         return new SuccessObject(SuccessCode.VIDEO_DELETED.isSuccess(), SuccessCode.VIDEO_DELETED.getCode());
     }
 }
